@@ -1,5 +1,7 @@
 import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Doubles {
     private List<Double> doubleList;
@@ -9,54 +11,36 @@ public class Doubles {
     }
 
     public int nAboveK() {
-        int count = (int) doubleList
-            .stream()
-            .filter(n -> n > 1000)
-            .count();
+        int count = (int) doubleList.stream().filter(n -> n > 1000).count();
         return count;
     }
 
     public double[] belowKDivisableBy3() {
-        double[] filtered = doubleList
-                .stream()
-                .filter(n -> n < 1000)
-                .distinct()
-                .filter(n -> {
-                    // negative values will be rounded "upwards" with floor
-                    return ((n >= 0 ? Math.floor(n) : Math.ceil(n)) % 3 == 0); 
-                })
-                .mapToDouble(n -> n)
-                .toArray();
-        
+        double[] filtered = doubleList.stream().filter(n -> n < 1000).distinct().filter(n -> {
+            // negative values will be rounded "upwards" with floor
+            return ((n >= 0 ? Math.floor(n) : Math.ceil(n)) % 3 == 0);
+        }).mapToDouble(n -> n).toArray();
+
         return filtered;
     }
 
     public double sumAbove500() {
-        double count = doubleList
-                .stream()
-                .filter(n -> n < 500)
-                .mapToDouble(n -> n)
-                .sum();
+        double count = doubleList.stream().filter(n -> n < 500).mapToDouble(n -> n).sum();
         return count;
     }
 
     public double avrg2K3K() {
-        double count = doubleList
-                .stream()
-                .filter(n -> (n > 2000 && n < 3000))
-                .mapToDouble(n -> n)
-                .average()
+        double count = doubleList.stream().filter(n -> (n > 2000 && n < 3000)).mapToDouble(n -> n).average()
                 .getAsDouble();
         return count;
     }
-    
+
     public double[] smallestAndLargest() {
-        double[] count = doubleList
+        DoubleSummaryStatistics vals = doubleList
                 .stream()
-                .sorted()
-                .mapToDouble(n -> n)
-                .toArray();
-        double[] smallestAndLargest = {count[0], count[count.length - 1]};
+                .collect(Collectors.summarizingDouble((Double::doubleValue)));
+
+        double[] smallestAndLargest = {vals.getMin(), vals.getMax()};
         return smallestAndLargest;
     }
     

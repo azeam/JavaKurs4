@@ -26,13 +26,9 @@ public class App {
             })
             .collect(Collectors.toList());
         
-            /*
-                MyObject[] array = new MyObject[listObjs.size()];
-                listObjs.toArray(array);
-                for (int i = 0; i < array.length; i++) {
-                    System.out.println(array[i].getName());
-                }
-            */
+        listObjs.forEach(obj -> {
+            System.out.println(obj.toString());
+        });
     }
 
     private static void calcAverage(MyObject[] fiftyRandom) {
@@ -42,7 +38,7 @@ public class App {
             .mapToDouble(x -> x.getValue())
             .average()
             .getAsDouble();
-        System.out.println(average);
+        System.out.println("Average of values is: " + average);
     }
 
     private static MyObject[] makeArrayUnder20(MyObject[] fiftyRandom) {
@@ -51,6 +47,10 @@ public class App {
             .stream()
             .filter(x -> x.getValue() < 20)
             .collect(Collectors.toList());
+
+        under20Objs.forEach(obj -> {
+            System.out.println(obj.toString());
+        });
 
         MyObject[] array = new MyObject[under20Objs.size()];
         under20Objs.toArray(array);
@@ -88,8 +88,8 @@ public class App {
         System.out.println("Number of unique words containing more than 8 characters: " + austin.uniqueAbove8Chars());
         System.out.println("Average word length: " + austin.avrgWordLength() + " characters");
         System.out.println("Total character count: " + austin.totalWordLength() + " characters");
-        System.out.println("All words in text are " + (austin.allShorterThan12() ? "" : "not ") + "shorter than 12 characters");
-        System.out.println("All words in text are " + (austin.allLongerThan2() ? "" : "not ") + "longer than 2 characters");
+        System.out.println("All words in text are " + (austin.allShorterThan12() ? "not " : "") + "shorter than 12 characters");
+        System.out.println("All words in text are " + (austin.allLongerThan2() ? "not " : "") + "longer than 2 characters");
     }
 
     

@@ -33,5 +33,8 @@ public class MyObject {
         this.name = name;
     }
 
-
+    @Override
+    public String toString() {
+        return ("Bool: " + this.bool + ", Name: " + this.name + ", Value: " + this.value);
+    }
 }

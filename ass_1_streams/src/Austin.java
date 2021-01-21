@@ -15,7 +15,7 @@ public class Austin {
             .stream()
             .filter(lessThan2)
             .count();
-        return (!(wordCount > 0));
+        return ((wordCount > 0));
     }
 
     public boolean allShorterThan12() {
@@ -24,7 +24,7 @@ public class Austin {
             .stream()
             .filter(moreThan12)
             .count();
-        return (!(wordCount > 0));
+        return ((wordCount > 0));
     }
 
     public int totalWordLength() {
