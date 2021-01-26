@@ -24,16 +24,39 @@ public class App {
         for (int i = 0; i <patterns.length; i++) {
             Scanner scanner = new Scanner(text);
             lineNumber = 1;
-            while(scanner.hasNextLine()){
-                String line = scanner.nextLine();
-                finder(line, patterns[i], lineNumber);
-                lineNumber++;
-            }      
-            scanner.close();
+            if (i != 3) {
+                while(scanner.hasNextLine()){
+                    String line = scanner.nextLine();
+                    finder(line, patterns[i], lineNumber);
+                    lineNumber++;
+                }      
+                scanner.close();    
+            }
+            else {
+                int count = 0;
+                while(scanner.hasNextLine()){
+                    String line = scanner.nextLine();
+                    count = count + counter(line, patterns[i]);
+                }      
+                System.out.println("Number of non-alphanumeric strings: " + count);
+                scanner.close();
+            }
         }
     }
 
-    public static void finder (String inputString, String pattern, int lineNumber) {
+    private static int counter(String inputString, String pattern) {
+        Pattern p = Pattern.compile(pattern);
+        Matcher matcher = p.matcher(inputString);
+        int i = 0;
+        while(matcher.find()){ //searches for string
+            if (matcher.group().length() != 0) {
+                i++;
+            }
+        }
+        return i;
+    }
+
+    public static void finder(String inputString, String pattern, int lineNumber) {
         Pattern p = Pattern.compile(pattern);
         Matcher matcher = p.matcher(inputString);
         while(matcher.find()){ //searches for string
