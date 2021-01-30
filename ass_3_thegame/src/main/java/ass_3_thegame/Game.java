@@ -14,7 +14,7 @@ public class Game {
         kommer och går i rummet.
         */
         
-        this.gui = new Gui();
+        this.gui = new Gui(stage);
 
         (new Thread(new Update(this.gui))).start();
 

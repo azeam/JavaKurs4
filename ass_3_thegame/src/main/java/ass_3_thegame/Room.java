@@ -6,8 +6,8 @@ public class Room {
     Inventory inventory;
     int roomId;
 
-    public Room(String roomName, Inventory inventory, int roomId) {
-        this.roomName = roomName;
+    public Room(int roomId, Inventory inventory) {
+        this.roomName = "Room" + roomId;
         this.inventory = inventory;
         this.roomId = roomId;
     }

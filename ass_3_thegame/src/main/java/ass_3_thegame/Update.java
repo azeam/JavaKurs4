@@ -3,12 +3,14 @@ package ass_3_thegame;
 import java.util.ArrayList;
 import java.util.List;
 
+import ass_3_thegame.factories.NpcFactory;
+import ass_3_thegame.factories.RoomFactory;
+
 public class Update implements Runnable {
 
     // Ska implementera Runnable och starta en tråd som Regelbundet updaterar Guit
     // utifrån vad som händer i spelet.
     Gui gui;
-    ArrayList<Npc> personGroup = new ArrayList<>();
 
     public Update(Gui gui) {
         this.gui = gui;
@@ -18,32 +20,84 @@ public class Update implements Runnable {
     public void run() {
         Names names = new Names();
         NpcFactory npcFactory = new NpcFactory();
+        RoomFactory roomFactory = new RoomFactory();
+
+        Inventory deletethis = new Inventory();
 
         List<String> namesList = names.getRandomNames(5);
-        personGroup = npcFactory.createGroup("Person", 5, namesList);
-        updateNpcPos();
+        ArrayList<Npc> personGroup = npcFactory.createGroup("Person", 5, namesList);
+        ArrayList<Room> roomGroup = roomFactory.createGroup(4, deletethis);
+
+        updateGui(personGroup, roomGroup);
     }
 
-    private void updateNpcPos() {
+    private void updateGui(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+        Direction randomDir;
+        int newX, newY, room;
 
         while (true) {
             try {
                 for (Npc person: personGroup) {
-                    // get random new direction, should only be done when hitting a wall
-                    Direction randomDir = Direction.getRandom(); 
-                    // move person
-                    person.setPosX(person.getPosX() + randomDir.getX()); 
-                    person.setPosY(person.getPosY() + randomDir.getY());
-                    person.showNpc();
-                    gui.setShowPersons(person);
+                    randomDir = person.getDirection();
+                    newX = person.getPosX() + randomDir.getX();
+                    newY = person.getPosY() + randomDir.getY();
+                    room = person.getCurRoom();
+                    changePos(person, newX, newY, room);
                 }
-                Thread.sleep(1000);
+                gui.setShowPersons(personGroup, roomGroup);
+                Thread.sleep(60);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-            
+            }   
         }
-        
-        
     }
+
+    private void changePos(Npc person, int newX, int newY, int room) {
+        if (newX <= 0 || newY <= 10 || newX >= Constants.ALL_ROOMS_WIDTH - 20|| newY >= Constants.ROOM_HEIGHT) { 
+            person.setDirection(Direction.getRandom());
+        }
+        else if (room == 1 && newX > Constants.ROOM_WIDTH) {
+            setRoomBottomDoor(person, newY, room + 1);
+        }
+        else if (room == 2 && newX > Constants.ROOM_WIDTH * 2) {
+            setRoomTopDoor(person, newY, room + 1);
+        }
+        else if (room == 2 && newX < Constants.ROOM_WIDTH) {
+            setRoomBottomDoor(person, newY, room - 1);
+        }
+        else if (room == 3 && newX > Constants.ROOM_WIDTH * 3) {
+            setRoomBottomDoor(person, newY, room + 1);
+        }
+        else if (room == 3 && newX < Constants.ROOM_WIDTH * 2) {
+            setRoomTopDoor(person, newY, room - 1);
+        }
+        else if (room == 4 && newX < Constants.ROOM_WIDTH * 3) {
+            setRoomBottomDoor(person, newY, room - 1);
+        }
+        else {
+            person.setPosX(newX);
+            person.setPosY(newY);    
+        //    System.out.println(person.npcName() + " is in room " + person.getCurRoom());
+        }
+    }
+
+    private void setRoomBottomDoor(Npc person, int newY, int newRoom) {
+        if (newY > Constants.WALL_SIZE) {
+            person.setCurRoom(newRoom);
+        }
+        else {
+            person.setDirection(Direction.getRandom());
+        }
+    }
+
+    private void setRoomTopDoor(Npc person, int newY, int newRoom) {
+        if (newY < Constants.WALL_SIZE) {
+            person.setCurRoom(newRoom);
+        }
+        else {
+            person.setDirection(Direction.getRandom());
+        }
+    }
+
+    
 }

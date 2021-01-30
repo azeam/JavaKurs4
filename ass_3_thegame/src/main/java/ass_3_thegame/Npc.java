@@ -6,9 +6,16 @@ public interface Npc {
     // det är okej att byta. Tänk bara på att byta extends mot implements i subklasserna.
     public String npcName();
     public String showNpc();
-    public int npcHP();
+    
+    public Direction getDirection();
+    public void setDirection(Direction direction);
+
     public int getPosX();
+    public void setPosX(int i);
+
     public int getPosY();
-	public void setPosX(int i);
-	public void setPosY(int i);
+    public void setPosY(int i);
+
+    public int getCurRoom();
+    public void setCurRoom(int room);
 }

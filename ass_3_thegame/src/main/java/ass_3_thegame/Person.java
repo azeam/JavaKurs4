@@ -3,16 +3,29 @@ package ass_3_thegame;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Person implements Npc {
-    int hp;
     int posX;
     int posY;
+    int curRoom;
+    Direction direction;
     String npcName;
 
     public Person(String name) {
-        this.hp = ThreadLocalRandom.current().nextInt(1, 20 + 1);
-        this.posX = ThreadLocalRandom.current().nextInt(1, 20 + 1);
-        this.posY = ThreadLocalRandom.current().nextInt(1, 20 + 1);
-        this.npcName = name;        
+        this.posX = ThreadLocalRandom.current().nextInt(1, 800 + 1);
+        this.posY = ThreadLocalRandom.current().nextInt(1, 200 + 1);
+        this.npcName = name;    
+        direction = Direction.getRandom();
+        if (this.posX < Constants.ROOM_WIDTH) {
+            this.curRoom = 1;
+        }
+        else if (this.posX < Constants.ROOM_WIDTH * 2) {
+            this.curRoom = 2;
+        }
+        else if (this.posX < Constants.ROOM_WIDTH * 3) {
+            this.curRoom = 3;
+        }
+        else {
+            this.curRoom = 4;
+        }
     }
 
     @Override
@@ -41,13 +54,8 @@ public class Person implements Npc {
     }
 
     @Override
-    public int npcHP() {
-        return this.hp;
-    }
-
-    @Override
     public String showNpc() {
-        return ("NPC " + this.npcName + " with hp: " + this.hp + " at position" + this.posX + ", " + this.posY);
+        return ("NPC " + this.npcName + " at position " + this.posX + ", " + this.posY);
     }
     /* 
         En person är Npc - dessa ska lagras i lista av något slag och
@@ -58,5 +66,24 @@ public class Person implements Npc {
         kan man antingen följa efter och vänta på att objekten läggs ned eller
         be om att byta mot ett objekt i det egna inventory.
     */
+
+    @Override
+    public Direction getDirection() {
+        return this.direction;
+    }
    
+    @Override
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    @Override
+    public int getCurRoom() {
+        return curRoom;
+    }
+
+    @Override
+    public void setCurRoom(int room) {
+        this.curRoom = room;
+    }
 }

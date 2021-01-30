@@ -1,105 +1,74 @@
 package ass_3_thegame;
 
-import javax.swing.*;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /*Extremt enkelt Gui för att kunna komma igång.
 Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kursmoment - så fastna inte här!
  */
 
 
-    public class Gui extends JFrame {
+    public class Gui {
+        private GraphicsContext context;
+        Painter painter = new Painter();
 
-        private static final long serialVersionUID = 7872228119670597697L;
-        private JPanel panel;
-        private JTextArea showRoom;
-        private JTextArea showPersons;
-        private JTextField input;
-        private JTextArea inventory;
-        private String command;
-        private boolean gotCommand;
-        private JButton button;
-        public Gui() {
-            this.gotCommand = false;
-            this.command = "";
-            this.setTitle("Game");
-            this.setSize(800, 600);
-            this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            setUpElements();
-            setUpPanel();
-            this.add(panel);
-            this.setVisible(true);
-            this.setResizable(false);
+        public Gui(Stage stage) {
+            StackPane root = new StackPane();
+            Canvas canvas = new Canvas(800, 600);
+            context = canvas.getGraphicsContext2D();
+
+            canvas.setFocusTraversable(true);
+            canvas.setOnKeyPressed(e -> {
+                switch (e.getCode()) {
+                    case UP:
+                        System.out.println("up");
+                        break;
+                    case DOWN:
+                        System.out.println("down");
+                        break;
+                    case LEFT:
+                        System.out.println("left");
+                        break;
+                    case RIGHT:
+                        System.out.println("right");
+                        break;
+                }
+            });
+
+            root.getChildren().add(canvas);
+
+            Scene scene = new Scene(root);
+
+
+            stage.setResizable(false);
+            stage.setTitle("The Game");
+            stage.setOnCloseRequest(e -> System.exit(0));
+            stage.setScene(scene);
+            stage.show();
         }
 
-        //Returnera det senaste commitade kommandot
-        public String getCommand(){
-            if (this.gotCommand){
-                System.out.println(this.command);
-                return this.command;
+        
+        public void setShowPersons(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+            painter.paint(context);
+            for (Npc person: personGroup) {
+                painter.paintPerson(context, person.getPosX(), person.getPosY(), person.npcName());
             }
-            return null;
-
-        }
-        //Här kan man updatera respektive fält:
-        public void setShowRoom(String roomDescription){
-            this.showRoom.setText(roomDescription);
-         }
-        public void setShowPersons(Npc person){
-            // print person data
-            // TODO: change to update position
-            this.showPersons.setText(person.showNpc());
-        }
-        public void setShowInventory(Inventory i){
-            this.input.setText(i.toString());
+            for (int i = 1; i < roomGroup.size(); i++) {
+                if (roomGroup.get(i).roomId %2 == 0) {
+                    painter.paintRoom(context, roomGroup.get(i).roomId, "up");
+                }
+                else {
+                    painter.paintRoom(context, roomGroup.get(i).roomId, "down");
+                }
+            }
         }
 
-        //Add person to room
-        public void setPerson(Person p){
-            this.showPersons.setText(p.toString());
-        }
-
-//Nedantåenda spaghetti är inte vacker...
-
-
-        public void gotCommand(){
-            this.gotCommand = false;
-        }
-
-        private void setUpPanel(){
-            this.panel.add(showPersons);
-            this.panel.add(showRoom);
-            this.panel.add(input);
-            this.panel.add(inventory);
-            this.panel.add(button);
-
-        }
-        private void setUpElements(){
-            this.panel = new JPanel(new GridLayout(4,3));
-            this.showRoom = new JTextArea("Room: ");
-            this.showPersons = new JTextArea("Persons");
-            this.inventory = new JTextArea("Inventory");
-            this.input = new JTextField("Give command");
-            this.showPersons.setEditable(false);
-            this.showRoom.setEditable(false);
-            this.inventory.setEditable(false);
-
-            ActionListener inputListener = e -> {
-                this.command = input.getText();
-                this.gotCommand = true;
-                System.out.println(this.command);
-            };
-
-            input.addActionListener(inputListener);
-
-            this.button = new JButton("commit");
-            this.button.addActionListener(inputListener);
-
-        }
-
-
+   
     }
 
 

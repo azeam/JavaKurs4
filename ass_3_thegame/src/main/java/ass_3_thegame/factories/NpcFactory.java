@@ -1,7 +1,10 @@
-package ass_3_thegame;
+package ass_3_thegame.factories;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ass_3_thegame.Npc;
+import ass_3_thegame.Person;
 
 public class NpcFactory {
 
