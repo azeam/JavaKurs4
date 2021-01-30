@@ -18,4 +18,6 @@ public interface Npc {
 
     public int getCurRoom();
     public void setCurRoom(int room);
+
+    public Inventory getInventory();
 }

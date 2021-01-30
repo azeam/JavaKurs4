@@ -1,17 +1,32 @@
 package ass_3_thegame;
 
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
+
+import ass_3_thegame.factories.GameObjectFactory;
 
 public class Person implements Npc {
     int posX;
     int posY;
     int curRoom;
+    Inventory inventory;
     Direction direction;
     String npcName;
 
     public Person(String name) {
-        this.posX = ThreadLocalRandom.current().nextInt(1, 800 + 1);
-        this.posY = ThreadLocalRandom.current().nextInt(1, 200 + 1);
+        
+        Inventory inv = new Inventory(Constants.INV_SIZE_NPC);
+        int randomNumItems = ThreadLocalRandom.current().nextInt(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC + 1);
+        GameObjectFactory gameObjectFactory = new GameObjectFactory();
+        ArrayList<GameObject> gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true);
+        for (GameObject obj: gameObjectGroup) {
+            inv.addToInventory(obj); 
+        }
+        
+        this.inventory = inv;
+
+        this.posX = ThreadLocalRandom.current().nextInt(1, Constants.ALL_ROOMS_WIDTH + 1);
+        this.posY = ThreadLocalRandom.current().nextInt(1, Constants.ROOM_HEIGHT + 1);
         this.npcName = name;    
         direction = Direction.getRandom();
         if (this.posX < Constants.ROOM_WIDTH) {
@@ -55,7 +70,7 @@ public class Person implements Npc {
 
     @Override
     public String showNpc() {
-        return ("NPC " + this.npcName + " at position " + this.posX + ", " + this.posY);
+        return ("NPC " + this.npcName + " at position " + this.posX + ", " + this.posY + " with inventory " + this.inventory);
     }
     /* 
         En person är Npc - dessa ska lagras i lista av något slag och
@@ -85,5 +100,10 @@ public class Person implements Npc {
     @Override
     public void setCurRoom(int room) {
         this.curRoom = room;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return this.inventory;
     }
 }

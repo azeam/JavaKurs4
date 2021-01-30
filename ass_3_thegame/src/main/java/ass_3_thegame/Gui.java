@@ -12,7 +12,6 @@ import java.util.ArrayList;
 Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kursmoment - så fastna inte här!
  */
 
-
     public class Gui {
         private GraphicsContext context;
         Painter painter = new Painter();
@@ -37,6 +36,8 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     case RIGHT:
                         System.out.println("right");
                         break;
+                    default:
+                        break;
                 }
             });
 
@@ -59,11 +60,11 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 painter.paintPerson(context, person.getPosX(), person.getPosY(), person.npcName());
             }
             for (int i = 1; i < roomGroup.size(); i++) {
-                if (roomGroup.get(i).roomId %2 == 0) {
-                    painter.paintRoom(context, roomGroup.get(i).roomId, "up");
+                if (roomGroup.get(i).getRoomId() %2 == 0) {
+                    painter.paintRoom(context, roomGroup.get(i).getRoomId(), "up");
                 }
                 else {
-                    painter.paintRoom(context, roomGroup.get(i).roomId, "down");
+                    painter.paintRoom(context, roomGroup.get(i).getRoomId(), "down");
                 }
             }
         }
