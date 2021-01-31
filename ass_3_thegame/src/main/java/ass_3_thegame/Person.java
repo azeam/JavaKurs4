@@ -14,7 +14,7 @@ public class Person implements Npc {
     String npcName;
 
     public Person(String name) {
-        
+
         Inventory inv = new Inventory(Constants.INV_SIZE_NPC);
         int randomNumItems = ThreadLocalRandom.current().nextInt(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC + 1);
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
@@ -25,8 +25,8 @@ public class Person implements Npc {
         
         this.inventory = inv;
 
-        this.posX = ThreadLocalRandom.current().nextInt(1, Constants.ALL_ROOMS_WIDTH + 1);
-        this.posY = ThreadLocalRandom.current().nextInt(1, Constants.ROOM_HEIGHT + 1);
+        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ALL_ROOMS_WIDTH - 1 + Constants.MARGIN);
+        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ROOM_HEIGHT - 1 + Constants.MARGIN);
         this.npcName = name;    
         direction = Direction.getRandom();
         if (this.posX < Constants.ROOM_WIDTH) {
@@ -42,6 +42,12 @@ public class Person implements Npc {
             this.curRoom = 4;
         }
     }
+
+    @Override
+    public boolean isCarrying() {
+        return (this.inventory.getInventory()[0] == null);
+    }
+
 
     @Override
     public void setPosX(int posX) {

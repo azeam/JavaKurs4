@@ -18,7 +18,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
         public Gui(Stage stage) {
             StackPane root = new StackPane();
-            Canvas canvas = new Canvas(800, 600);
+            Canvas canvas = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
             context = canvas.getGraphicsContext2D();
 
             canvas.setFocusTraversable(true);
@@ -57,7 +57,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         public void setShowPersons(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
             painter.paint(context);
             for (Npc person: personGroup) {
-                painter.paintPerson(context, person.getPosX(), person.getPosY(), person.npcName());
+                painter.paintPerson(context, person.getPosX(), person.getPosY(), person.npcName(), person.isCarrying());
             }
             for (int i = 1; i < roomGroup.size(); i++) {
                 if (roomGroup.get(i).getRoomId() %2 == 0) {

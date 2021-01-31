@@ -1,7 +1,6 @@
 package ass_3_thegame;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ass_3_thegame.factories.NpcFactory;
@@ -12,7 +11,7 @@ public class Update implements Runnable {
     // Ska implementera Runnable och starta en tråd som Regelbundet updaterar Guit
     // utifrån vad som händer i spelet.
     Gui gui;
-    int numNPCs = 5;
+    int numNPCs = 10; // API max is 10
     int numRooms = 4;
 
     public Update(Gui gui) {
@@ -25,7 +24,7 @@ public class Update implements Runnable {
         NpcFactory npcFactory = new NpcFactory();
         RoomFactory roomFactory = new RoomFactory();
 
-        List<String> namesList = Arrays.asList("test", "test", "test", "test", "test"); // TODO: change to: names.getRandomNames(5);
+        List<String> namesList = names.getRandomNames(numNPCs);
         ArrayList<Npc> personGroup = npcFactory.createGroup("Person", numNPCs, namesList);
         ArrayList<Room> roomGroup = roomFactory.createGroup(numRooms);
 
@@ -48,7 +47,7 @@ public class Update implements Runnable {
                     changePos(person, newX, newY, room);
                 }
                 gui.setShowPersons(personGroup, roomGroup);
-                Thread.sleep(60);
+                Thread.sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }   
@@ -56,7 +55,7 @@ public class Update implements Runnable {
     }
 
     private void changePos(Npc person, int newX, int newY, int room) {
-        if (newX <= 0 || newY <= 0 || newX >= Constants.ALL_ROOMS_WIDTH || newY >= Constants.ROOM_HEIGHT) { 
+        if (newX <= Constants.MARGIN || newY <= Constants.MARGIN || newX >= Constants.ALL_ROOMS_WIDTH + Constants.MARGIN || newY >= Constants.ROOM_HEIGHT + Constants.MARGIN) { 
             person.setDirection(Direction.getRandom());
         }
         else if (room == 1 && newX > Constants.ROOM_WIDTH) {
@@ -85,7 +84,7 @@ public class Update implements Runnable {
     }
 
     private void setRoomBottomDoor(Npc person, int newY, int newRoom) {
-        if (newY > Constants.WALL_SIZE) {
+        if (newY > Constants.WALL_SIZE + Constants.MARGIN) {
             person.setCurRoom(newRoom);
         }
         else {
@@ -94,7 +93,7 @@ public class Update implements Runnable {
     }
 
     private void setRoomTopDoor(Npc person, int newY, int newRoom) {
-        if (newY < Constants.WALL_SIZE) {
+        if (newY < (Constants.ROOM_HEIGHT - Constants.WALL_SIZE + Constants.MARGIN)) {
             person.setCurRoom(newRoom);
         }
         else {
