@@ -29,11 +29,11 @@ public class Update implements Runnable {
         ArrayList<Room> roomGroup = roomFactory.createGroup(numRooms);
 
         // TODO: get room inventory and update gui
-
-        updateGui(personGroup, roomGroup);
+        gui.setUpWalls(roomGroup);
+        updateGui(personGroup);
     }
 
-    private void updateGui(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+    private void updateGui(ArrayList<Npc> personGroup) {
         Direction randomDir;
         int newX, newY, room;
 
@@ -46,7 +46,7 @@ public class Update implements Runnable {
                     room = person.getCurRoom();
                     changePos(person, newX, newY, room);
                 }
-                gui.setShowPersons(personGroup, roomGroup);
+                gui.setShowObjects(personGroup);
                 Thread.sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -54,6 +54,7 @@ public class Update implements Runnable {
         }
     }
 
+    // TODO: make dynamic
     private void changePos(Npc person, int newX, int newY, int room) {
         if (newX <= Constants.MARGIN || newY <= Constants.MARGIN || newX >= Constants.ALL_ROOMS_WIDTH + Constants.MARGIN || newY >= Constants.ROOM_HEIGHT + Constants.MARGIN) { 
             person.setDirection(Direction.getRandom());
@@ -61,19 +62,19 @@ public class Update implements Runnable {
         else if (room == 1 && newX > Constants.ROOM_WIDTH) {
             setRoomBottomDoor(person, newY, room + 1);
         }
-        else if (room == 2 && newX > Constants.ROOM_WIDTH * 2) {
+        else if (room == 2 && newX > Constants.ROOM_WIDTH * room) {
             setRoomTopDoor(person, newY, room + 1);
         }
         else if (room == 2 && newX < Constants.ROOM_WIDTH) {
             setRoomBottomDoor(person, newY, room - 1);
         }
-        else if (room == 3 && newX > Constants.ROOM_WIDTH * 3) {
+        else if (room == 3 && newX > Constants.ROOM_WIDTH * room) {
             setRoomBottomDoor(person, newY, room + 1);
         }
-        else if (room == 3 && newX < Constants.ROOM_WIDTH * 2) {
+        else if (room == 3 && newX < Constants.ROOM_WIDTH * (room - 1)) {
             setRoomTopDoor(person, newY, room - 1);
         }
-        else if (room == 4 && newX < Constants.ROOM_WIDTH * 3) {
+        else if (room == 4 && newX < Constants.ROOM_WIDTH * (room - 1)) {
             setRoomBottomDoor(person, newY, room - 1);
         }
         else {

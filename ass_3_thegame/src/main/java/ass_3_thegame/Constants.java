@@ -8,6 +8,7 @@ public class Constants {
                             ROOM_HEIGHT = 200,
                             NPC_SIZE = 5,
                             WALL_SIZE = 150,
+                            WALL_WIDTH = 1,
                             INV_SIZE_NPC = 1,
                             INV_SIZE_NPC_MIN = 0,
                             INV_SIZE_ROOM = 10,

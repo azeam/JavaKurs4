@@ -45,7 +45,6 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
             Scene scene = new Scene(root);
 
-
             stage.setResizable(false);
             stage.setTitle("The Game");
             stage.setOnCloseRequest(e -> System.exit(0));
@@ -54,21 +53,25 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         }
 
         
-        public void setShowPersons(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+        public void setShowObjects(ArrayList<Npc> personGroup) {
             painter.paint(context);
+            painter.paintRoom(context);
             for (Npc person: personGroup) {
                 painter.paintPerson(context, person.getPosX(), person.getPosY(), person.npcName(), person.isCarrying());
             }
-            for (int i = 1; i < roomGroup.size(); i++) {
-                if (roomGroup.get(i).getRoomId() %2 == 0) {
-                    painter.paintRoom(context, roomGroup.get(i).getRoomId(), "up");
-                }
-                else {
-                    painter.paintRoom(context, roomGroup.get(i).getRoomId(), "down");
-                }
-            }
         }
 
+
+		public void setUpWalls(ArrayList<Room> roomGroup) {
+            for (int i = 1; i < roomGroup.size(); i++) {
+                if (roomGroup.get(i).getRoomId() %2 == 0) {
+                    painter.setUpWalls(context, roomGroup.get(i).getRoomId(), "up");
+                }
+                else {
+                    painter.setUpWalls(context, roomGroup.get(i).getRoomId(), "down");
+                }
+            }
+		}
    
     }
 

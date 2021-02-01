@@ -5,6 +5,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import ass_3_thegame.factories.GameObjectFactory;
 
+ /* 
+        En person är Npc - dessa ska lagras i lista av något slag och
+        ha ett eget liv så till vida att de ska hanteras concurrent. Npc:ernas
+        beteende bestäms av slumptal. Det rör sig mellan rummen, plockar upp,
+        lägger ned saker. Det ska finnas en showPerson, som visar personens
+        namn och vad denne bär på. Vill man ha något som personen bär på så
+        kan man antingen följa efter och vänta på att objekten läggs ned eller
+        be om att byta mot ett objekt i det egna inventory.
+    */
+
 public class Person implements Npc {
     int posX;
     int posY;
@@ -48,7 +58,6 @@ public class Person implements Npc {
         return (this.inventory.getInventory()[0] == null);
     }
 
-
     @Override
     public void setPosX(int posX) {
         this.posX = posX;
@@ -78,15 +87,6 @@ public class Person implements Npc {
     public String showNpc() {
         return ("NPC " + this.npcName + " at position " + this.posX + ", " + this.posY + " with inventory " + this.inventory);
     }
-    /* 
-        En person är Npc - dessa ska lagras i lista av något slag och
-        ha ett eget liv så till vida att de ska hanteras concurrent. Npc:ernas
-        beteende bestäms av slumptal. Det rör sig mellan rummen, plockar upp,
-        lägger ned saker. Det ska finnas en showPerson, som visar personens
-        namn och vad denne bär på. Vill man ha något som personen bär på så
-        kan man antingen följa efter och vänta på att objekten läggs ned eller
-        be om att byta mot ett objekt i det egna inventory.
-    */
 
     @Override
     public Direction getDirection() {
