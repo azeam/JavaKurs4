@@ -30,6 +30,7 @@ public class Update implements Runnable {
 
         // TODO: get room inventory and update gui
         gui.setUpWalls(roomGroup);
+        gui.setUpPerson(personGroup);
         updateGui(personGroup);
     }
 
@@ -47,7 +48,7 @@ public class Update implements Runnable {
                     changePos(person, newX, newY, room);
                 }
                 gui.setShowObjects(personGroup);
-                Thread.sleep(20);
+                Thread.sleep(60);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }   

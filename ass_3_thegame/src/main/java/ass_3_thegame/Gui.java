@@ -54,13 +54,12 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
         
         public void setShowObjects(ArrayList<Npc> personGroup) {
-            painter.paint(context);
-            painter.paintRoom(context);
-            for (Npc person: personGroup) {
-                painter.paintPerson(context, person.getPosX(), person.getPosY(), person.npcName(), person.isCarrying());
-            }
+                painter.paint(context, personGroup);
         }
 
+        public void setUpPerson(ArrayList<Npc> personGroup) {
+            painter.setUpPerson(context, personGroup);
+        }
 
 		public void setUpWalls(ArrayList<Room> roomGroup) {
             for (int i = 1; i < roomGroup.size(); i++) {
