@@ -24,7 +24,20 @@ public class Person implements Npc {
     String npcName;
 
     public Person(String name) {
+        this.npcName = name;
 
+        makeInventory();
+        setStartPosition();
+        setCurRoom();
+    }
+
+    private void setStartPosition() {
+        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ALL_ROOMS_WIDTH - 1 + Constants.MARGIN);
+        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ROOM_HEIGHT - 1 + Constants.MARGIN);    
+        direction = Direction.getRandom();
+    }
+
+    private void makeInventory() {
         Inventory inv = new Inventory(Constants.INV_SIZE_NPC);
         int randomNumItems = ThreadLocalRandom.current().nextInt(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC + 1);
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
@@ -32,25 +45,7 @@ public class Person implements Npc {
         for (GameObject obj: gameObjectGroup) {
             inv.addToInventory(obj); 
         }
-        
         this.inventory = inv;
-
-        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ALL_ROOMS_WIDTH - 1 + Constants.MARGIN);
-        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ROOM_HEIGHT - 1 + Constants.MARGIN);
-        this.npcName = name;    
-        direction = Direction.getRandom();
-        if (this.posX < Constants.ROOM_WIDTH) {
-            this.curRoom = 1;
-        }
-        else if (this.posX < Constants.ROOM_WIDTH * 2) {
-            this.curRoom = 2;
-        }
-        else if (this.posX < Constants.ROOM_WIDTH * 3) {
-            this.curRoom = 3;
-        }
-        else {
-            this.curRoom = 4;
-        }
     }
 
     @Override
@@ -104,8 +99,15 @@ public class Person implements Npc {
     }
 
     @Override
-    public void setCurRoom(int room) {
-        this.curRoom = room;
+    public void setCurRoom() {
+        for (int i = 1; i <= Constants.NUM_ROOMS; i++) {
+            if (this.posX < Constants.ROOM_WIDTH + Constants.MARGIN) {
+                this.curRoom = 1;
+            }
+            else if (this.posX > Constants.ROOM_WIDTH * i + Constants.MARGIN && this.posX < Constants.ROOM_WIDTH * (i + 1) + Constants.MARGIN) {
+                this.curRoom = i + 1;
+            }
+        }
     }
 
     @Override

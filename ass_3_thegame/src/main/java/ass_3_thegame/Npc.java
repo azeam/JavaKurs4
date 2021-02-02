@@ -17,7 +17,7 @@ public interface Npc {
     public void setPosY(int i);
 
     public int getCurRoom();
-    public void setCurRoom(int room);
+    public void setCurRoom();
 
     public Inventory getInventory();
 	public boolean isCarrying();

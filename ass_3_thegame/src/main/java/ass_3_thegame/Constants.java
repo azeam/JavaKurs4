@@ -1,9 +1,8 @@
 package ass_3_thegame;
 
 public class Constants {
-    public final static int WINDOW_WIDTH = 1300,
+    public final static int 
                             WINDOW_HEIGHT = 800,
-                            ALL_ROOMS_WIDTH = 1200,
                             ROOM_WIDTH = 300,
                             ROOM_HEIGHT = 200,
                             NPC_SIZE = 5,
@@ -14,6 +13,10 @@ public class Constants {
                             INV_SIZE_ROOM = 10,
                             INV_SIZE_ROOM_MIN = 5,
                             INV_SIZE_PLAYER = 5,
-                            MARGIN = 50;
+                            MARGIN = 50,
+                            NUM_NPCS = 10, // API max is 10
+                            NUM_ROOMS = 4,
+                            WINDOW_WIDTH = NUM_ROOMS * ROOM_WIDTH + 2 * MARGIN,
+                            ALL_ROOMS_WIDTH = NUM_ROOMS * ROOM_WIDTH;
 
 }

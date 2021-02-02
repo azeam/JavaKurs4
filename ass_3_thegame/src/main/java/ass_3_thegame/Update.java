@@ -11,8 +11,7 @@ public class Update implements Runnable {
     // Ska implementera Runnable och starta en tråd som Regelbundet updaterar Guit
     // utifrån vad som händer i spelet.
     Gui gui;
-    int numNPCs = 10; // API max is 10
-    int numRooms = 4;
+    Painter painter = new Painter();
 
     public Update(Gui gui) {
         this.gui = gui;
@@ -24,9 +23,9 @@ public class Update implements Runnable {
         NpcFactory npcFactory = new NpcFactory();
         RoomFactory roomFactory = new RoomFactory();
 
-        List<String> namesList = names.getRandomNames(numNPCs);
-        ArrayList<Npc> personGroup = npcFactory.createGroup("Person", numNPCs, namesList);
-        ArrayList<Room> roomGroup = roomFactory.createGroup(numRooms);
+        List<String> namesList = names.getRandomNames(Constants.NUM_NPCS);
+        ArrayList<Npc> personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList);
+        ArrayList<Room> roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
 
         // TODO: get room inventory and update gui
         gui.setUpWalls(roomGroup);
@@ -35,17 +34,23 @@ public class Update implements Runnable {
     }
 
     private void updateGui(ArrayList<Npc> personGroup) {
-        Direction randomDir;
-        int newX, newY, room;
+        Direction curDir;
+        int newX, newY;
 
         while (true) {
             try {
                 for (Npc person: personGroup) {
-                    randomDir = person.getDirection();
-                    newX = person.getPosX() + randomDir.getX();
-                    newY = person.getPosY() + randomDir.getY();
-                    room = person.getCurRoom();
-                    changePos(person, newX, newY, room);
+                    curDir = person.getDirection();
+                    newX = person.getPosX() + curDir.getX();
+                    newY = person.getPosY() + curDir.getY();
+                    if (painter.collision(person, newX, newY)) {
+                        person.setDirection(Direction.getOpposite(person.getDirection())); 
+                        curDir = person.getDirection();
+                        newX = person.getPosX() + curDir.getX();
+                        newY = person.getPosY() + curDir.getY();    
+                    }
+                    
+                    changePos(person, newX, newY);                   
                 }
                 gui.setShowObjects(personGroup);
                 Thread.sleep(60);
@@ -55,53 +60,13 @@ public class Update implements Runnable {
         }
     }
 
-    // TODO: make dynamic
-    private void changePos(Npc person, int newX, int newY, int room) {
-        if (newX <= Constants.MARGIN || newY <= Constants.MARGIN || newX >= Constants.ALL_ROOMS_WIDTH + Constants.MARGIN || newY >= Constants.ROOM_HEIGHT + Constants.MARGIN) { 
-            person.setDirection(Direction.getRandom());
-        }
-        else if (room == 1 && newX > Constants.ROOM_WIDTH) {
-            setRoomBottomDoor(person, newY, room + 1);
-        }
-        else if (room == 2 && newX > Constants.ROOM_WIDTH * room) {
-            setRoomTopDoor(person, newY, room + 1);
-        }
-        else if (room == 2 && newX < Constants.ROOM_WIDTH) {
-            setRoomBottomDoor(person, newY, room - 1);
-        }
-        else if (room == 3 && newX > Constants.ROOM_WIDTH * room) {
-            setRoomBottomDoor(person, newY, room + 1);
-        }
-        else if (room == 3 && newX < Constants.ROOM_WIDTH * (room - 1)) {
-            setRoomTopDoor(person, newY, room - 1);
-        }
-        else if (room == 4 && newX < Constants.ROOM_WIDTH * (room - 1)) {
-            setRoomBottomDoor(person, newY, room - 1);
-        }
-        else {
-            person.setPosX(newX);
-            person.setPosY(newY);    
-        //    System.out.println(person.npcName() + " is in room " + person.getCurRoom());
-        }
-    }
+    private void changePos(Npc person, int newX, int newY) {
+        person.setPosX(newX);
+        person.setPosY(newY);   
+        person.setCurRoom();
 
-    private void setRoomBottomDoor(Npc person, int newY, int newRoom) {
-        if (newY > Constants.WALL_SIZE + Constants.MARGIN) {
-            person.setCurRoom(newRoom);
-        }
-        else {
-            person.setDirection(Direction.getRandom());
-        }
+        int room = person.getCurRoom();
+        System.out.println(person.npcName() + " is in room: " + room); 
     }
-
-    private void setRoomTopDoor(Npc person, int newY, int newRoom) {
-        if (newY < (Constants.ROOM_HEIGHT - Constants.WALL_SIZE + Constants.MARGIN)) {
-            person.setCurRoom(newRoom);
-        }
-        else {
-            person.setDirection(Direction.getRandom());
-        }
-    }
-
     
 }
