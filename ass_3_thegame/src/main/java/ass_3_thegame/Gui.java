@@ -14,12 +14,15 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
     public class Gui {
         private GraphicsContext context;
+        private GraphicsContext background;
         Painter painter = new Painter();
 
         public Gui(Stage stage) {
             StackPane root = new StackPane();
             Canvas canvas = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+            Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
             context = canvas.getGraphicsContext2D();
+            background = canvasBG.getGraphicsContext2D();
 
             canvas.setFocusTraversable(true);
             canvas.setOnKeyPressed(e -> {
@@ -41,6 +44,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 }
             });
 
+            root.getChildren().add(canvasBG);
             root.getChildren().add(canvas);
 
             Scene scene = new Scene(root);
@@ -53,8 +57,8 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         }
 
         
-        public void setShowObjects(ArrayList<Npc> personGroup) {
-                painter.paint(context, personGroup);
+        public void setShowObjects(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+                painter.paint(context, personGroup, roomGroup);
         }
 
         public void setUpPerson(ArrayList<Npc> personGroup) {
@@ -64,10 +68,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 		public void setUpWalls(ArrayList<Room> roomGroup) {
             for (int i = 1; i < roomGroup.size(); i++) {
                 if (roomGroup.get(i).getRoomId() %2 == 0) {
-                    painter.setUpWalls(context, roomGroup.get(i).getRoomId(), "up");
+                    painter.setUpWalls(background, roomGroup.get(i).getRoomId(), "up");
                 }
                 else {
-                    painter.setUpWalls(context, roomGroup.get(i).getRoomId(), "down");
+                    painter.setUpWalls(background, roomGroup.get(i).getRoomId(), "down");
                 }
             }
 		}

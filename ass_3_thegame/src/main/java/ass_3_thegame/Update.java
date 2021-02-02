@@ -5,6 +5,7 @@ import java.util.List;
 
 import ass_3_thegame.factories.NpcFactory;
 import ass_3_thegame.factories.RoomFactory;
+import javafx.animation.AnimationTimer;
 
 public class Update implements Runnable {
 
@@ -12,6 +13,7 @@ public class Update implements Runnable {
     // utifrån vad som händer i spelet.
     Gui gui;
     Painter painter = new Painter();
+    static boolean paused = false;
 
     public Update(Gui gui) {
         this.gui = gui;
@@ -27,37 +29,46 @@ public class Update implements Runnable {
         ArrayList<Npc> personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList);
         ArrayList<Room> roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
 
-        // TODO: get room inventory and update gui
         gui.setUpWalls(roomGroup);
         gui.setUpPerson(personGroup);
-        updateGui(personGroup);
+        updateGui(personGroup, roomGroup);
     }
 
-    private void updateGui(ArrayList<Npc> personGroup) {
-        Direction curDir;
-        int newX, newY;
-
-        while (true) {
-            try {
+    private void updateGui(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
                 for (Npc person: personGroup) {
+                    Direction curDir;
+                    int newX, newY;
+                    GameObject itemHit;
                     curDir = person.getDirection();
                     newX = person.getPosX() + curDir.getX();
                     newY = person.getPosY() + curDir.getY();
-                    if (painter.collision(person, newX, newY)) {
+                    if (painter.wallCollision(newX, newY)) {
                         person.setDirection(Direction.getOpposite(person.getDirection())); 
                         curDir = person.getDirection();
                         newX = person.getPosX() + curDir.getX();
                         newY = person.getPosY() + curDir.getY();    
                     }
-                    
+                    for (Room room : roomGroup) {
+                        itemHit = painter.itemCollision(room, newX, newY);
+                        if (itemHit != null) {
+                            room.getInventory().exchangeItem(itemHit, person.getInventory(), "npcPickup");
+                        }
+                    }
                     changePos(person, newX, newY);                   
                 }
-                gui.setShowObjects(personGroup);
-                Thread.sleep(60);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }   
+                gui.setShowObjects(personGroup, roomGroup);
+            }
+        };
+        if (paused) {
+            timer.stop();
         }
+        else {
+            timer.start();
+        }
+       
     }
 
     private void changePos(Npc person, int newX, int newY) {
@@ -65,8 +76,8 @@ public class Update implements Runnable {
         person.setPosY(newY);   
         person.setCurRoom();
 
-        int room = person.getCurRoom();
-        System.out.println(person.npcName() + " is in room: " + room); 
+     //   int room = person.getCurRoom();
+     //   System.out.println(person.npcName() + " is in room: " + room); 
     }
     
 }

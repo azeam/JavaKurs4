@@ -19,9 +19,9 @@ public class Room {
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
         ArrayList<GameObject> gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false);
         for (GameObject obj: gameObjectGroup) {
-            inv.addToInventory(obj); 
+            inv.addToInventory(inv.getInventory(), obj); 
         }
-
+        this.inventory = inv;
         this.roomId = roomId;
     }
 

@@ -43,7 +43,7 @@ public class Person implements Npc {
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
         ArrayList<GameObject> gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true);
         for (GameObject obj: gameObjectGroup) {
-            inv.addToInventory(obj); 
+            inv.addToInventory(inv.getInventory(), obj); 
         }
         this.inventory = inv;
     }
