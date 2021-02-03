@@ -3,7 +3,6 @@ package ass_3_thegame;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
@@ -81,7 +80,7 @@ public class Painter {
             nodePerson.setY(nextY);
             intersect = Shape.intersect(nodeWall, nodePerson);
             if (intersect.getBoundsInParent().getWidth() > 0) {
-                System.out.println("collision");
+  //              System.out.println("wall collision");
                 return true;
             } 
         }
@@ -89,7 +88,6 @@ public class Painter {
     }
 
     public GameObject itemCollision(Room room, int nextX, int nextY) {
-        
             for (GameObject object : room.getInventory().getInventory()) {
                 if (object != null) {
                     Rectangle nodeObj = new Rectangle(Constants.NPC_SIZE, Constants.NPC_SIZE);
@@ -104,7 +102,6 @@ public class Painter {
                     } 
                 }
             }
-        
         return null;
 	}
 

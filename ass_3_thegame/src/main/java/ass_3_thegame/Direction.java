@@ -33,19 +33,19 @@ public enum Direction {
 
     public static Direction getOpposite(Direction curDir) {
         Direction newDir = switch (curDir) {
-            case N -> values()[getRandomBetween(5, 6, 7)];
-            case NW -> values()[getRandomBetween(7, 6, 4)];
-            case NE -> values()[getRandomBetween(5, 3, 7)];
-            case W -> values()[getRandomBetween(2, 4, 6)];
-            case E -> values()[getRandomBetween(1, 3, 5)];
-            case SW -> values()[getRandomBetween(0, 2, 4)];
-            case SE -> values()[getRandomBetween(0, 2, 3)];
-            default -> values()[getRandomBetween(0, 1, 2)];
+            case N -> values()[getRandomOf(5, 6, 7)];
+            case NW -> values()[getRandomOf(7, 6, 4)];
+            case NE -> values()[getRandomOf(5, 3, 7)];
+            case W -> values()[getRandomOf(2, 4, 6)];
+            case E -> values()[getRandomOf(1, 3, 5)];
+            case SW -> values()[getRandomOf(0, 2, 4)];
+            case SE -> values()[getRandomOf(0, 2, 3)];
+            default -> values()[getRandomOf(0, 1, 2)];
         };
         return newDir;
     }
 
-    private static int getRandomBetween(int first, int second, int third) {
+    private static int getRandomOf(int first, int second, int third) {
         int i;
         i = ThreadLocalRandom.current().nextInt(0, 7 + 1);
         while (i != first && i != second && i != third) {

@@ -34,16 +34,20 @@ public class Inventory {
         }
     }
 
-	public void exchangeItem(GameObject gameObject, Inventory inventory2, String exchType) {
+	public void exchangeItem(GameObject gameObject, Inventory otherInventory, String exchType, int newX, int newY) {
         GameObject otherObject = null;
         // define before replace or npc inventory will be already replaced
         if (exchType.equals("npcPickup")) {
-            otherObject = inventory2.getInventory()[0];
+            otherObject = otherInventory.getInventory()[0];
         }
+        
         // add the collected object to npcs inventory if possible
-        if (addToInventory(inventory2.getInventory(), gameObject)) {
+        if (addToInventory(otherInventory.getInventory(), gameObject)) {
             replaceItem(otherObject, gameObject);
-//            System.out.println("exchanged inventory " + Arrays.toString(this.inventory) + " with " + Arrays.toString(inventory2.getInventory()));    
+            gameObject.setPosX(newX);
+            gameObject.setPosY(newY);    
+        
+            System.out.println("exchanged inventory " + Arrays.toString(this.inventory) + " with " + Arrays.toString(otherInventory.getInventory()));    
         }
 	}
 

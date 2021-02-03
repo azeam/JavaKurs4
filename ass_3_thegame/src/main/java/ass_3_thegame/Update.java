@@ -2,6 +2,7 @@ package ass_3_thegame;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import ass_3_thegame.factories.NpcFactory;
 import ass_3_thegame.factories.RoomFactory;
@@ -42,6 +43,7 @@ public class Update implements Runnable {
                     Direction curDir;
                     int newX, newY;
                     GameObject itemHit;
+                    Room room = roomGroup.get(person.getCurRoom() - 1);
                     curDir = person.getDirection();
                     newX = person.getPosX() + curDir.getX();
                     newY = person.getPosY() + curDir.getY();
@@ -51,12 +53,20 @@ public class Update implements Runnable {
                         newX = person.getPosX() + curDir.getX();
                         newY = person.getPosY() + curDir.getY();    
                     }
-                    for (Room room : roomGroup) {
-                        itemHit = painter.itemCollision(room, newX, newY);
-                        if (itemHit != null) {
-                            room.getInventory().exchangeItem(itemHit, person.getInventory(), "npcPickup");
-                        }
+                    itemHit = painter.itemCollision(room, newX, newY);
+                    if (itemHit != null && itemHit.isPickable()) {
+                        room.getInventory().exchangeItem(itemHit, person.getInventory(), "npcPickup", newX, newY);
                     }
+                    // TODO: not working well - problem is that it picks it up immediately because it drops in hitbox
+                    else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.getInventory().getInventory()[0] != null) {
+                        Direction behind = (person.getDirection());
+                        int behindX = person.getPosX() - behind.getX() * 5;
+                        int behindY = person.getPosY() - behind.getY() * 5;
+                        System.out.println(person.npcName() + " attempting drop off at " + behindX + " " + behindY);
+
+                        person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(), "npcDropoff", behindX, behindY);
+                    }
+                    
                     changePos(person, newX, newY);                   
                 }
                 gui.setShowObjects(personGroup, roomGroup);
@@ -76,8 +86,8 @@ public class Update implements Runnable {
         person.setPosY(newY);   
         person.setCurRoom();
 
-     //   int room = person.getCurRoom();
-     //   System.out.println(person.npcName() + " is in room: " + room); 
+        int room = person.getCurRoom();
+  //      System.out.println(person.npcName() + " is in room: " + room); 
     }
     
 }

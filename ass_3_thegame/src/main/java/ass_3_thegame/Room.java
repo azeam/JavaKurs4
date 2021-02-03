@@ -14,8 +14,9 @@ public class Room {
     public Room(int roomId) {
         this.roomName = "Room" + roomId;
 
-        Inventory inv = new Inventory(Constants.INV_SIZE_ROOM);
+        
         int randomNumItems = ThreadLocalRandom.current().nextInt(Constants.INV_SIZE_ROOM_MIN, Constants.INV_SIZE_ROOM + 1);
+        Inventory inv = new Inventory(Constants.INV_SIZE_ROOM);
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
         ArrayList<GameObject> gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false);
         for (GameObject obj: gameObjectGroup) {
