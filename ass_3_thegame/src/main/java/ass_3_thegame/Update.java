@@ -18,9 +18,9 @@ public class Update implements Runnable {
 
     public Update(Gui gui) {
         this.gui = gui;
-	}
+    }
 
-	@Override
+    @Override
     public void run() {
         Names names = new Names();
         NpcFactory npcFactory = new NpcFactory();
@@ -39,18 +39,24 @@ public class Update implements Runnable {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                for (Npc person: personGroup) {
+                for (Npc person : personGroup) {
                     Direction curDir;
                     int newX, newY;
+                    GameObject itemHit;
                     Room room = roomGroup.get(person.getCurRoom() - 1);
                     curDir = person.getDirection();
                     newX = person.getPosX() + curDir.getX();
                     newY = person.getPosY() + curDir.getY();
-                    
-                    // TODO: not working well - sometimes not possible to pick up (problem is in hit detection but I don't see why)
-                    // possible to add more than limit - check streams
-                    if (!person.isCarrying() && painter.itemCollision(room, newX, newY) != null && painter.itemCollision(room, newX, newY).isPickable()) {
-                        room.getInventory().exchangeItem(painter.itemCollision(room, newX, newY), person.getInventory(), "npcPickup", newX, newY);
+
+                    // TODO: not working well - sometimes not possible to pick up (problem is in hit
+                    // detection but I don't see why)
+                    itemHit = painter.itemCollision(room, newX, newY);
+                    if (itemHit != null && !itemHit.isPickable()) {
+                        person.setDirection(Direction.getOpposite(person.getDirection()));
+                    }
+                    else if (!person.isCarrying() && itemHit != null && itemHit.isPickable()) {
+                        room.getInventory().exchangeItem(itemHit, person.getInventory(),
+                                "npcPickup", newX, newY);
                     }
                     else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) {
                         Direction behind = (person.getDirection());
@@ -58,13 +64,14 @@ public class Update implements Runnable {
                         int behindY = person.getPosY() - behind.getY() * Constants.OBJ_SIZE;
                         System.out.println(person.npcName() + " attempting drop off at " + behindX + " " + behindY);
 
-                        person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(), "npcDropoff", behindX, behindY);
+                        person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(),
+                                "npcDropoff", behindX, behindY);
                     }
+                    
                     if (painter.wallCollision(newX, newY)) {
-                        person.setDirection(Direction.getOpposite(person.getDirection())); 
-                    }
-                    else {
-                        changePos(person, newX, newY);                   
+                        person.setDirection(Direction.getOpposite(person.getDirection()));
+                    } else {
+                        changePos(person, newX, newY);
                     }
                 }
                 gui.setShowObjects(personGroup, roomGroup);

@@ -11,7 +11,7 @@ import ass_3_thegame.GameObject;
 
 public class GameObjectFactory {
     public GameObject createGameObject(int number, boolean onlyPickable) {
-        return new GameObject();
+        return new GameObject(onlyPickable);
     }
 
 	public ArrayList<GameObject> createGroup(int number, boolean onlyPickable) {

@@ -89,20 +89,15 @@ public class Painter {
 
     public GameObject itemCollision(Room room, int nextX, int nextY) {
         Rectangle nodeObj;
-        Rectangle testPerson;
             for (GameObject object : room.getInventory().getInventory()) {
                 if (object != null) {
                     nodeObj = new Rectangle(Constants.OBJ_SIZE, Constants.OBJ_SIZE);
                     nodeObj.setX(object.getPosX());
                     nodeObj.setY(object.getPosY());
-                    testPerson = new Rectangle(Constants.NPC_SIZE, Constants.NPC_SIZE);
-                    testPerson.setX(nextX);
-                    testPerson.setY(nextY);
-                    intersect = Shape.intersect(nodeObj, testPerson);
-                    if (intersect.getBoundsInParent().getWidth() > 0) {
+                    if (nodeObj.getBoundsInParent().intersects(nextX, nextY, Constants.NPC_SIZE, Constants.NPC_SIZE)) {
                         System.out.println("item hit");                   
                         return object;
-                    } 
+                    }
                 }
             }
         return null;
@@ -122,11 +117,19 @@ public class Painter {
             gc.fillRect(nodePerson.getX(), nodePerson.getY(), nodePerson.getWidth(), nodePerson.getHeight());
         }
 
-        gc.setFill(Color.YELLOW);    
         for (int i = 0; i < roomGroup.size(); i++ ) {
             GameObject[] roomObjects = roomGroup.get(i).getInventory().getInventory();
             for (GameObject obj: roomObjects) {
                 if (obj != null) {
+                    if (obj.getType() == "Key") {
+                        gc.setFill(Color.YELLOW);
+                    }
+                    else if (obj.getType() == "Chest") {
+                        gc.setFill(Color.GREY);
+                    }
+                    else if (obj.getType() == "Furniture") {
+                        gc.setFill(Color.WHITE);
+                    }
                     gc.fillRect(obj.getPosX(), obj.getPosY(), Constants.OBJ_SIZE, Constants.OBJ_SIZE);
                 }
             }

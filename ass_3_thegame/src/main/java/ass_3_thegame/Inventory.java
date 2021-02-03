@@ -9,16 +9,24 @@ import java.util.stream.Collectors;
 
 public class Inventory {
     private GameObject[] inventory;
+    private int maxItems;
+
+    public int getMaxItems() {
+        return this.maxItems;
+    }
 
     public Inventory(int maxItems) {
         this.inventory = new GameObject[maxItems];
+        this.maxItems = maxItems;
     }
 
     public GameObject[] getInventory() {
         return this.inventory;
     }
 
-
+    public void setInventory(GameObject[] inventory) {
+        this.inventory = inventory;
+    }
 
 
 
@@ -30,31 +38,31 @@ public class Inventory {
     // sätt ny till Inventory
 
 
-    public boolean addToInventory(GameObject[] inv, GameObject gameObject) {
-        List<GameObject> arrAsList = Arrays.asList(inv);
-        System.out.println("Unsorted inv: " + Arrays.toString(inv));
+    public boolean addToInventory(Inventory inv, GameObject gameObject) {
+        GameObject[] objArray = inv.getInventory();
+        GameObject[] newObjArray = new GameObject[inv.getMaxItems()];
+        List<GameObject> arrAsList = Arrays.asList(objArray);
+        System.out.println("Unsorted inv: " + Arrays.toString(objArray));
         // make new list without nulls
-        arrAsList = arrAsList
+        newObjArray = arrAsList
             .stream()
             .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
-            .collect(Collectors.toList());
+            .toArray(GameObject[]::new);
 
         List<GameObject> arrAsListCopy = arrAsList
             .stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
            
-        if (arrAsListCopy.size() < inv.length) {
+        if (arrAsListCopy.size() < objArray.length) {
+            newObjArray[arrAsListCopy.size()] = gameObject;
             // setting inv[i] will modify the passed in object, updating it via streams does not
             // TODO: inv can grow indefinitely, why?!
+            inv.setInventory(newObjArray);
             System.out.println("list size " + arrAsList.size() + " list copy size " + arrAsListCopy.size());
-            for (int i=0; i<arrAsList.size(); i++) {
-                inv[i] = arrAsList.get(i);
-                inv[arrAsListCopy.size()] = gameObject;
-            }
             System.out.println("Unsorted: " + arrAsList);
-            System.out.println("Sorted: " + Arrays.toString(inv));
-            System.out.println("Added item to inventory, new inv: " + Arrays.toString(inv));
+            System.out.println("Sorted: " + Arrays.toString(objArray));
+            System.out.println("Added item to inventory, new inv: " + Arrays.toString(objArray));
             return true;
         }
         else {
@@ -70,7 +78,7 @@ public class Inventory {
         }
         
         // add the collected object to npcs inventory if possible
-        if (addToInventory(otherInventory.getInventory(), gameObject)) {
+        if (addToInventory(otherInventory, gameObject)) {
             replaceItem(otherObject, gameObject);
             gameObject.setPosX(newX);
             gameObject.setPosY(newY);    
@@ -90,6 +98,7 @@ public class Inventory {
                 }
                 return x;
             })
+            .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
             .toArray(GameObject[]::new);
     }
 

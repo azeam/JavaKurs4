@@ -1,5 +1,6 @@
 package ass_3_thegame;
 
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GameObject {
@@ -10,12 +11,24 @@ public class GameObject {
     private String type;
     private int posX, posY;
 
-
-    public GameObject() {
-        this.type = "Key";
+    public GameObject(boolean onlyPickable) {
+        if (onlyPickable) {
+            this.type = "Key";
+        }
+        else {
+            String [] types = {"Key", "Chest", "Furniture"};
+            Random random = new Random();
+            int select = random.nextInt(types.length); 
+            this.type = types[select];    
+        }
         this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ALL_ROOMS_WIDTH - Constants.OBJ_SIZE + Constants.MARGIN);
         this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ROOM_HEIGHT - Constants.OBJ_SIZE + Constants.MARGIN); 
-        this.pickable = true;   
+        if (this.type == "Key") {
+            this.pickable = true;  
+        }
+        else {
+            this.pickable = false;
+        } 
     }
 
     public String getType() {
