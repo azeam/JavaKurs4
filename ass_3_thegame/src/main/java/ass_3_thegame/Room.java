@@ -22,12 +22,17 @@ public class Room {
         for (GameObject obj: gameObjectGroup) {
             inv.addToInventory(inv.getInventory(), obj); 
         }
+        System.out.println("Inventory size of room: " + inv.getInventory().length);
         this.inventory = inv;
         this.roomId = roomId;
     }
 
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    public void setInventory(Inventory inv) {
+        this.inventory = inv;
     }
 
     public int getRoomId() {

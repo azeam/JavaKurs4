@@ -13,8 +13,8 @@ public class GameObject {
 
     public GameObject() {
         this.type = "Key";
-        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ALL_ROOMS_WIDTH - 1 + Constants.MARGIN);
-        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ROOM_HEIGHT - 1 + Constants.MARGIN); 
+        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ALL_ROOMS_WIDTH - Constants.OBJ_SIZE + Constants.MARGIN);
+        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ROOM_HEIGHT - Constants.OBJ_SIZE + Constants.MARGIN); 
         this.pickable = true;   
     }
 

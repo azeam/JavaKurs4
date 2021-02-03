@@ -88,16 +88,19 @@ public class Painter {
     }
 
     public GameObject itemCollision(Room room, int nextX, int nextY) {
+        Rectangle nodeObj;
+        Rectangle testPerson;
             for (GameObject object : room.getInventory().getInventory()) {
                 if (object != null) {
-                    Rectangle nodeObj = new Rectangle(Constants.NPC_SIZE, Constants.NPC_SIZE);
+                    nodeObj = new Rectangle(Constants.OBJ_SIZE, Constants.OBJ_SIZE);
                     nodeObj.setX(object.getPosX());
                     nodeObj.setY(object.getPosY());
-                    nodePerson = new Rectangle(Constants.NPC_SIZE, Constants.NPC_SIZE);
-                    nodePerson.setX(nextX);
-                    nodePerson.setY(nextY);
-                    intersect = Shape.intersect(nodeObj, nodePerson);
+                    testPerson = new Rectangle(Constants.NPC_SIZE, Constants.NPC_SIZE);
+                    testPerson.setX(nextX);
+                    testPerson.setY(nextY);
+                    intersect = Shape.intersect(nodeObj, testPerson);
                     if (intersect.getBoundsInParent().getWidth() > 0) {
+                        System.out.println("item hit");                   
                         return object;
                     } 
                 }
@@ -110,10 +113,10 @@ public class Painter {
         for (int i = 0; i < persons.getChildren().size(); i++ ) {
             nodePerson = (Rectangle) persons.getChildren().get(i);
             if (personGroup.get(i).isCarrying()) {
-                gc.setFill(Color.GREEN);    
+                gc.setFill(Color.RED);    
             }
             else {
-                gc.setFill(Color.RED);
+                gc.setFill(Color.GREEN);
             }
             gc.fillText(personGroup.get(i).npcName(), personGroup.get(i).getPosX(), personGroup.get(i).getPosY());                        
             gc.fillRect(nodePerson.getX(), nodePerson.getY(), nodePerson.getWidth(), nodePerson.getHeight());
@@ -124,7 +127,7 @@ public class Painter {
             GameObject[] roomObjects = roomGroup.get(i).getInventory().getInventory();
             for (GameObject obj: roomObjects) {
                 if (obj != null) {
-                    gc.fillOval(obj.getPosX(), obj.getPosY(), Constants.NPC_SIZE, Constants.NPC_SIZE);
+                    gc.fillRect(obj.getPosX(), obj.getPosY(), Constants.OBJ_SIZE, Constants.OBJ_SIZE);
                 }
             }
         } 

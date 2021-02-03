@@ -32,8 +32,8 @@ public class Person implements Npc {
     }
 
     private void setStartPosition() {
-        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ALL_ROOMS_WIDTH - 1 + Constants.MARGIN);
-        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + 1, Constants.ROOM_HEIGHT - 1 + Constants.MARGIN);    
+        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_SIZE, Constants.ALL_ROOMS_WIDTH - Constants.NPC_SIZE + Constants.MARGIN);
+        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_SIZE, Constants.ROOM_HEIGHT - Constants.NPC_SIZE + Constants.MARGIN);    
         direction = Direction.getRandom();
     }
 
@@ -50,7 +50,7 @@ public class Person implements Npc {
 
     @Override
     public boolean isCarrying() {
-        return (this.inventory.getInventory()[0] == null);
+        return (this.inventory.getInventory()[0] != null);
     }
 
     @Override

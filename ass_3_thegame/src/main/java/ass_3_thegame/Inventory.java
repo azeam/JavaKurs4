@@ -1,6 +1,8 @@
 package ass_3_thegame;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -16,17 +18,43 @@ public class Inventory {
         return this.inventory;
     }
 
-    public boolean addToInventory(GameObject[] inventory, GameObject gameObject) {
-        List<GameObject> arrAsList = Arrays.asList(inventory);
+
+
+
+
+
+    // TODO: skicka Inventory
+    // hämta maxsize
+    // gör ny array med maxsize
+    // hämta befintlig -> modifiera
+    // sätt ny till Inventory
+
+
+    public boolean addToInventory(GameObject[] inv, GameObject gameObject) {
+        List<GameObject> arrAsList = Arrays.asList(inv);
+        System.out.println("Unsorted inv: " + Arrays.toString(inv));
         // make new list without nulls
         arrAsList = arrAsList
+            .stream()
+            .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
+            .collect(Collectors.toList());
+
+        List<GameObject> arrAsListCopy = arrAsList
             .stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
            
-        if (arrAsList.size() < inventory.length) {
-            inventory[arrAsList.size()] = gameObject;
-            System.out.println("Added item to inventory, new inv: " + Arrays.toString(inventory));
+        if (arrAsListCopy.size() < inv.length) {
+            // setting inv[i] will modify the passed in object, updating it via streams does not
+            // TODO: inv can grow indefinitely, why?!
+            System.out.println("list size " + arrAsList.size() + " list copy size " + arrAsListCopy.size());
+            for (int i=0; i<arrAsList.size(); i++) {
+                inv[i] = arrAsList.get(i);
+                inv[arrAsListCopy.size()] = gameObject;
+            }
+            System.out.println("Unsorted: " + arrAsList);
+            System.out.println("Sorted: " + Arrays.toString(inv));
+            System.out.println("Added item to inventory, new inv: " + Arrays.toString(inv));
             return true;
         }
         else {
@@ -54,7 +82,7 @@ public class Inventory {
     private void replaceItem(GameObject otherObject, GameObject myObject) {
         List<GameObject> arrAsList = Arrays.asList(this.inventory);
         // find object collided with and exchange it with Npcs item
-        arrAsList = arrAsList
+        this.inventory = arrAsList
             .stream()
             .map(x -> {
                 if (x == myObject) {
@@ -62,10 +90,7 @@ public class Inventory {
                 }
                 return x;
             })
-            .collect(Collectors.toList());
-
-//            System.out.println("after filtering: " + arrAsList);
-            this.inventory = arrAsList.toArray(new GameObject[arrAsList.size()]);
+            .toArray(GameObject[]::new);
     }
 
 
