@@ -3,29 +3,42 @@ package ass_3_thegame;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-public class Painter {
-
-    // TODO: collision detection with nodes
-    
+public class Painter {    
     static Group walls = new Group();
-    static Group persons = new Group();
-    private Rectangle top, bottom, left, right, inner, nodePerson, nodeWall;
-    private List<Rectangle> npc = new ArrayList<Rectangle>();
-    private Shape intersect;
 
-    public void paint(GraphicsContext gc, ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+    private Rectangle top, bottom, left, right, inner, nodeWall, rectPerson, nodeItem;
+    private List<ImageView> personsList = new ArrayList<ImageView>();
+    private List<Rectangle> itemsList = new ArrayList<Rectangle>();
+    private List<GameObject> itemsObjList = new ArrayList<GameObject>();
+
+    private Shape intersect;
+    private static final Image monsterImage = new Image("https://www.bufonaturvard.se/images/monster2.png");
+    private static final Image monsterItemImage = new Image("https://www.bufonaturvard.se/images/monster_item2.png");
+
+    public void paint(Pane root, ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
         for (int i = 0; i < personGroup.size(); i++) {
-            npc.get(i).setX(personGroup.get(i).getPosX());
-            npc.get(i).setY(personGroup.get(i).getPosY());
-            draw(gc, personGroup, roomGroup);                         
+            Npc person = personGroup.get(i);
+            if (person.isCarrying()) {
+                personsList.get(i).setImage(monsterItemImage);
+            }
+            else {
+                personsList.get(i).setImage(monsterImage);
+            }
+            personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
+            personsList.get(i).setTranslateY(personGroup.get(i).getPosY());                        
         }
+        
     }
 
     public void setUpWalls(GraphicsContext gc, int order, String doorLocation) {
@@ -65,76 +78,93 @@ public class Painter {
         }
     }
 
-    public void setUpPerson(GraphicsContext gc, ArrayList<Npc> personGroup) {
+    public void setUpPerson(Pane root, ArrayList<Npc> personGroup) {
         for (int i = 0; i < personGroup.size(); i++) {
-            npc.add(new Rectangle(Constants.NPC_SIZE, Constants.NPC_SIZE));
+            ImageView monster = new ImageView(monsterImage);
+            personsList.add(monster);
         }
-        persons.getChildren().addAll(npc);        
+        Platform.runLater(() -> {
+            root.getChildren().addAll(personsList);
+        });
+    }
+
+    public void setUpItems(Pane root, ArrayList<Room> roomGroup) {
+        for (int i = 0; i < roomGroup.size(); i++) {
+            for (GameObject g: roomGroup.get(i).getInventory().getInventory()) {
+                if (g != null) {
+                    addItem(root, g);
+                }    
+            }
+        }
     }
 
     public boolean wallCollision(int nextX, int nextY) {
         for (Node wall : walls.getChildren()) {
             nodeWall = (Rectangle) wall;
-            nodePerson = new Rectangle(Constants.NPC_SIZE, Constants.NPC_SIZE);
-            nodePerson.setX(nextX);
-            nodePerson.setY(nextY);
-            intersect = Shape.intersect(nodeWall, nodePerson);
+            rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+            rectPerson.setX(nextX);
+            rectPerson.setY(nextY);
+            intersect = Shape.intersect(nodeWall, rectPerson);
             if (intersect.getBoundsInParent().getWidth() > 0) {
-  //              System.out.println("wall collision");
                 return true;
             } 
         }
         return false;
     }
 
-    public GameObject itemCollision(Room room, int nextX, int nextY) {
-        Rectangle nodeObj;
-            for (GameObject object : room.getInventory().getInventory()) {
-                if (object != null) {
-                    nodeObj = new Rectangle(Constants.OBJ_SIZE, Constants.OBJ_SIZE);
-                    nodeObj.setX(object.getPosX());
-                    nodeObj.setY(object.getPosY());
-                    if (nodeObj.getBoundsInParent().intersects(nextX, nextY, Constants.NPC_SIZE, Constants.NPC_SIZE)) {
-                        System.out.println("item hit");                   
-                        return object;
-                    }
+    public boolean itemCollision(Pane root, Npc person, Room room, int nextX, int nextY) {
+        GameObject object = null;
+        int i = 0;
+        for (Node item : itemsList) {
+            nodeItem = (Rectangle) item;
+            rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+            rectPerson.setX(nextX);
+            rectPerson.setY(nextY);
+
+            intersect = Shape.intersect(nodeItem, rectPerson);
+            if (intersect.getBoundsInParent().getWidth() > 0) {
+                object = itemsObjList.get(i);
+                if (!object.isPickable()) {
+                    person.setDirection(Direction.getOpposite(person.getDirection()));
+                    return true;
                 }
-            }
-        return null;
+                else if (!person.isCarrying() && object.isPickable()) {
+                    if (room.getInventory().exchangeItem(object, person.getInventory(),
+                            "npcPickup", nextX, nextY)) {   
+                                itemsList.remove(item);
+                                itemsObjList.remove(object);
+                                Platform.runLater(() -> {
+                                    root.getChildren().remove(item);
+                                });  
+                                return true;       
+                            }
+                }                  
+            } 
+            i++;
+        }
+        return false;
 	}
 
-    private void draw(GraphicsContext gc, ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
-        gc.clearRect(0, 0, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
-        for (int i = 0; i < persons.getChildren().size(); i++ ) {
-            nodePerson = (Rectangle) persons.getChildren().get(i);
-            if (personGroup.get(i).isCarrying()) {
-                gc.setFill(Color.RED);    
+	public void addItem(Pane root, GameObject g) {
+        if (g != null) {
+            System.out.println("adding dropped key");
+            Rectangle item = new Rectangle(g.getPosX(), g.getPosY(), Constants.OBJ_SIZE, Constants.OBJ_SIZE);
+            if (g.getType() == "Key") {
+                item.setFill(Color.YELLOW);
             }
-            else {
-                gc.setFill(Color.GREEN);
+            else if (g.getType() == "Chest") {
+                item.setFill(Color.GREY);
             }
-            gc.fillText(personGroup.get(i).npcName(), personGroup.get(i).getPosX(), personGroup.get(i).getPosY());                        
-            gc.fillRect(nodePerson.getX(), nodePerson.getY(), nodePerson.getWidth(), nodePerson.getHeight());
-        }
-
-        for (int i = 0; i < roomGroup.size(); i++ ) {
-            GameObject[] roomObjects = roomGroup.get(i).getInventory().getInventory();
-            for (GameObject obj: roomObjects) {
-                if (obj != null) {
-                    if (obj.getType() == "Key") {
-                        gc.setFill(Color.YELLOW);
-                    }
-                    else if (obj.getType() == "Chest") {
-                        gc.setFill(Color.GREY);
-                    }
-                    else if (obj.getType() == "Furniture") {
-                        gc.setFill(Color.WHITE);
-                    }
-                    gc.fillRect(obj.getPosX(), obj.getPosY(), Constants.OBJ_SIZE, Constants.OBJ_SIZE);
-                }
+            else if (g.getType() == "Furniture") {
+                item.setFill(Color.WHITE);
             }
-        } 
+            itemsList.add(item);
+            itemsObjList.add(g);
+            Platform.runLater(() -> {
+                root.getChildren().add(item);
+            });
+        }         
+	}
             
-    }
 
 }

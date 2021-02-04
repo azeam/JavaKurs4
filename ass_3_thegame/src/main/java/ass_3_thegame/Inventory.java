@@ -1,7 +1,6 @@
 package ass_3_thegame;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -28,22 +27,11 @@ public class Inventory {
         this.inventory = inventory;
     }
 
-
-
-
-    // TODO: skicka Inventory
-    // hämta maxsize
-    // gör ny array med maxsize
-    // hämta befintlig -> modifiera
-    // sätt ny till Inventory
-
-
     public boolean addToInventory(Inventory inv, GameObject gameObject) {
         GameObject[] objArray = inv.getInventory();
         GameObject[] newObjArray = new GameObject[inv.getMaxItems()];
         List<GameObject> arrAsList = Arrays.asList(objArray);
         System.out.println("Unsorted inv: " + Arrays.toString(objArray));
-        // make new list without nulls
         newObjArray = arrAsList
             .stream()
             .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
@@ -53,24 +41,20 @@ public class Inventory {
             .stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-           
+            System.out.println("arraslistcopy size: " + arrAsListCopy.size() + " objArray.length: " + objArray.length);
         if (arrAsListCopy.size() < objArray.length) {
             newObjArray[arrAsListCopy.size()] = gameObject;
-            // setting inv[i] will modify the passed in object, updating it via streams does not
-            // TODO: inv can grow indefinitely, why?!
             inv.setInventory(newObjArray);
-            System.out.println("list size " + arrAsList.size() + " list copy size " + arrAsListCopy.size());
-            System.out.println("Unsorted: " + arrAsList);
-            System.out.println("Sorted: " + Arrays.toString(objArray));
-            System.out.println("Added item to inventory, new inv: " + Arrays.toString(objArray));
+            System.out.println("Added item to inventory, new inv: " + Arrays.toString(inv.getInventory()));
             return true;
         }
         else {
+            System.out.println("Unable to add to inventory, inv: " + Arrays.toString(newObjArray));
             return false;
         }
     }
 
-	public void exchangeItem(GameObject gameObject, Inventory otherInventory, String exchType, int newX, int newY) {
+	public boolean exchangeItem(GameObject gameObject, Inventory otherInventory, String exchType, int newX, int newY) {
         GameObject otherObject = null;
         // define before replace or npc inventory will be already replaced
         if (exchType.equals("npcPickup")) {
@@ -82,9 +66,9 @@ public class Inventory {
             replaceItem(otherObject, gameObject);
             gameObject.setPosX(newX);
             gameObject.setPosY(newY);    
-        
-            System.out.println("exchanged inventory " + Arrays.toString(this.inventory) + " with " + Arrays.toString(otherInventory.getInventory()));    
+            return true;
         }
+        return false;
 	}
 
     private void replaceItem(GameObject otherObject, GameObject myObject) {

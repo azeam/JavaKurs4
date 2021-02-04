@@ -29,10 +29,6 @@ public class Room {
         return this.inventory;
     }
 
-    public void setInventory(Inventory inv) {
-        this.inventory = inv;
-    }
-
     public int getRoomId() {
         return this.roomId;
     }

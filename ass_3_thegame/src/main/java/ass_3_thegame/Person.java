@@ -32,8 +32,8 @@ public class Person implements Npc {
     }
 
     private void setStartPosition() {
-        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_SIZE, Constants.ALL_ROOMS_WIDTH - Constants.NPC_SIZE + Constants.MARGIN);
-        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_SIZE, Constants.ROOM_HEIGHT - Constants.NPC_SIZE + Constants.MARGIN);    
+        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_WIDTH, Constants.ALL_ROOMS_WIDTH - Constants.NPC_WIDTH + Constants.MARGIN);
+        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_HEIGHT, Constants.ROOM_HEIGHT - Constants.NPC_HEIGHT + Constants.MARGIN);    
         direction = Direction.getRandom();
     }
 
@@ -114,4 +114,5 @@ public class Person implements Npc {
     public Inventory getInventory() {
         return this.inventory;
     }
+
 }

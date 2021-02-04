@@ -20,5 +20,6 @@ public interface Npc {
     public void setCurRoom();
 
     public Inventory getInventory();
+    
 	public boolean isCarrying();
 }

@@ -30,8 +30,11 @@ public class Update implements Runnable {
         ArrayList<Npc> personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList);
         ArrayList<Room> roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
 
-        gui.setUpWalls(roomGroup);
-        gui.setUpPerson(personGroup);
+        Player player = new Player();
+
+        gui.setUpWalls(painter, roomGroup);
+        gui.setUpPerson(painter, personGroup);
+        gui.setUpItems(painter, roomGroup);
         updateGui(personGroup, roomGroup);
     }
 
@@ -39,42 +42,38 @@ public class Update implements Runnable {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                Direction curDir;
+                int newX, newY;
+                Room room;
                 for (Npc person : personGroup) {
-                    Direction curDir;
-                    int newX, newY;
-                    GameObject itemHit;
-                    Room room = roomGroup.get(person.getCurRoom() - 1);
+                    room = roomGroup.get(person.getCurRoom() - 1);
                     curDir = person.getDirection();
                     newX = person.getPosX() + curDir.getX();
                     newY = person.getPosY() + curDir.getY();
 
                     // TODO: not working well - sometimes not possible to pick up (problem is in hit
                     // detection but I don't see why)
-                    itemHit = painter.itemCollision(room, newX, newY);
-                    if (itemHit != null && !itemHit.isPickable()) {
+//                    System.out.println("itemhit is " + itemHit);
+                    if (gui.itemCollision(painter, person, room, newX, newY)) {}
+                    else if (painter.wallCollision(newX, newY)) {
                         person.setDirection(Direction.getOpposite(person.getDirection()));
-                    }
-                    else if (!person.isCarrying() && itemHit != null && itemHit.isPickable()) {
-                        room.getInventory().exchangeItem(itemHit, person.getInventory(),
-                                "npcPickup", newX, newY);
-                    }
+                    }                     
                     else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) {
                         Direction behind = (person.getDirection());
                         int behindX = person.getPosX() - behind.getX() * Constants.OBJ_SIZE;
                         int behindY = person.getPosY() - behind.getY() * Constants.OBJ_SIZE;
                         System.out.println(person.npcName() + " attempting drop off at " + behindX + " " + behindY);
-
-                        person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(),
-                                "npcDropoff", behindX, behindY);
+                        GameObject item = person.getInventory().getInventory()[0];
+                        if (person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(),
+                                "npcDropoff", behindX, behindY)) {
+                                    gui.addItem(painter, item);
+                                }
                     }
-                    
-                    if (painter.wallCollision(newX, newY)) {
-                        person.setDirection(Direction.getOpposite(person.getDirection()));
-                    } else {
+                    else {
                         changePos(person, newX, newY);
                     }
                 }
-                gui.setShowObjects(personGroup, roomGroup);
+                gui.setShowObjects(painter, personGroup, roomGroup);
             }
         };
         if (paused) {
@@ -92,7 +91,7 @@ public class Update implements Runnable {
         person.setCurRoom();
 
         int room = person.getCurRoom();
-  //      System.out.println(person.npcName() + " is in room: " + room); 
+     //   System.out.println(person.npcName() + " is in room: " + room); 
     }
     
 }
