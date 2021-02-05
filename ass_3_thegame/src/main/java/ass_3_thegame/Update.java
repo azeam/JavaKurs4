@@ -13,28 +13,34 @@ public class Update implements Runnable {
     // Ska implementera Runnable och starta en tråd som Regelbundet updaterar Guit
     // utifrån vad som händer i spelet.
     Gui gui;
-    Painter painter = new Painter();
     static boolean paused = false;
+    Names names = new Names();
+    NpcFactory npcFactory = new NpcFactory();
+    RoomFactory roomFactory = new RoomFactory();
+    private ArrayList<Room> roomGroup;
+    private List<String> namesList;
+    private ArrayList<Npc> personGroup;
+    private Painter painter;
 
-    public Update(Gui gui) {
+    public Update(Gui gui, Painter painter) {
         this.gui = gui;
+        this.painter = painter;
+        roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
+        gui.setUpWalls(roomGroup); // set up walls and items before persons to check for wall collision
+        gui.setUpItems(roomGroup);
+
+        namesList = names.getRandomNames(Constants.NUM_NPCS);
+        personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, painter);
+
+        Player player = new Player();
+        
+        gui.setUpPerson(personGroup);
+        
     }
 
     @Override
     public void run() {
-        Names names = new Names();
-        NpcFactory npcFactory = new NpcFactory();
-        RoomFactory roomFactory = new RoomFactory();
-
-        List<String> namesList = names.getRandomNames(Constants.NUM_NPCS);
-        ArrayList<Npc> personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList);
-        ArrayList<Room> roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
-
-        Player player = new Player();
-
-        gui.setUpWalls(painter, roomGroup);
-        gui.setUpPerson(painter, personGroup);
-        gui.setUpItems(painter, roomGroup);
+        
         updateGui(personGroup, roomGroup);
     }
 
@@ -51,29 +57,28 @@ public class Update implements Runnable {
                     newX = person.getPosX() + curDir.getX();
                     newY = person.getPosY() + curDir.getY();
 
-                    // TODO: not working well - sometimes not possible to pick up (problem is in hit
-                    // detection but I don't see why)
-//                    System.out.println("itemhit is " + itemHit);
-                    if (gui.itemCollision(painter, person, room, newX, newY)) {}
-                    else if (painter.wallCollision(newX, newY)) {
+                    if (gui.itemCollision(person, room, newX, newY)) {}
+                    else if (painter.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
                         person.setDirection(Direction.getOpposite(person.getDirection()));
                     }                     
                     else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) {
                         Direction behind = (person.getDirection());
-                        int behindX = person.getPosX() - behind.getX() * Constants.OBJ_SIZE;
-                        int behindY = person.getPosY() - behind.getY() * Constants.OBJ_SIZE;
+                        
+                        int behindX = behind.getX() > 0 ? person.getPosX() - behind.getX() * Constants.OBJ_SIZE : person.getPosX() - behind.getX() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
+                        int behindY = behind.getY() > 0 ? person.getPosY() - behind.getY() * Constants.OBJ_SIZE : person.getPosY() - behind.getY() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
+                        
                         System.out.println(person.npcName() + " attempting drop off at " + behindX + " " + behindY);
                         GameObject item = person.getInventory().getInventory()[0];
                         if (person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(),
                                 "npcDropoff", behindX, behindY)) {
-                                    gui.addItem(painter, item);
+                                    gui.addItem(item);
                                 }
                     }
                     else {
                         changePos(person, newX, newY);
                     }
                 }
-                gui.setShowObjects(painter, personGroup, roomGroup);
+                gui.setShowObjects(personGroup, roomGroup);
             }
         };
         if (paused) {

@@ -31,7 +31,6 @@ public class Inventory {
         GameObject[] objArray = inv.getInventory();
         GameObject[] newObjArray = new GameObject[inv.getMaxItems()];
         List<GameObject> arrAsList = Arrays.asList(objArray);
-        System.out.println("Unsorted inv: " + Arrays.toString(objArray));
         newObjArray = arrAsList
             .stream()
             .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
@@ -41,7 +40,7 @@ public class Inventory {
             .stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-            System.out.println("arraslistcopy size: " + arrAsListCopy.size() + " objArray.length: " + objArray.length);
+    //        System.out.println("arraslistcopy size: " + arrAsListCopy.size() + " objArray.length: " + objArray.length);
         if (arrAsListCopy.size() < objArray.length) {
             newObjArray[arrAsListCopy.size()] = gameObject;
             inv.setInventory(newObjArray);

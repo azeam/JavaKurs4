@@ -10,6 +10,7 @@ public class App extends Application {
 
   @Override
   public void start(Stage stage) {
-    new Game(stage);    
+    Painter painter = new Painter();
+    new Game(stage, painter);    
   }
 }

@@ -14,7 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-public class Painter {    
+public final class Painter {    
     static Group walls = new Group();
 
     private Rectangle top, bottom, left, right, inner, nodeWall, rectPerson, nodeItem;
@@ -36,9 +36,9 @@ public class Painter {
                 personsList.get(i).setImage(monsterImage);
             }
             personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
-            personsList.get(i).setTranslateY(personGroup.get(i).getPosY());                        
+            personsList.get(i).setTranslateY(personGroup.get(i).getPosY());  
+                                 
         }
-        
     }
 
     public void setUpWalls(GraphicsContext gc, int order, String doorLocation) {
@@ -84,7 +84,7 @@ public class Painter {
             personsList.add(monster);
         }
         Platform.runLater(() -> {
-            root.getChildren().addAll(personsList);
+            root.getChildren().addAll(personsList);    
         });
     }
 
@@ -98,10 +98,10 @@ public class Painter {
         }
     }
 
-    public boolean wallCollision(int nextX, int nextY) {
+    public boolean wallCollision(int nextX, int nextY, int hitboxX, int hitboxY) {
         for (Node wall : walls.getChildren()) {
             nodeWall = (Rectangle) wall;
-            rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+            rectPerson = new Rectangle(hitboxX, hitboxY);
             rectPerson.setX(nextX);
             rectPerson.setY(nextY);
             intersect = Shape.intersect(nodeWall, rectPerson);
@@ -112,17 +112,22 @@ public class Painter {
         return false;
     }
 
-    public boolean itemCollision(Pane root, Npc person, Room room, int nextX, int nextY) {
+    public boolean itemCollision(Pane root, Npc person, Room room, int nextX, int nextY, int hitboxX, int hitboxY) {
         GameObject object = null;
         int i = 0;
-        for (Node item : itemsList) {
+        for (Node item : this.itemsList) {
             nodeItem = (Rectangle) item;
-            rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+            rectPerson = new Rectangle(hitboxX, hitboxY);
             rectPerson.setX(nextX);
             rectPerson.setY(nextY);
 
             intersect = Shape.intersect(nodeItem, rectPerson);
             if (intersect.getBoundsInParent().getWidth() > 0) {
+                // just check any element for hit manually
+                if (root == null && person == null && room == null) {
+                    return true;
+                }
+                // npc item pickup/collision
                 object = itemsObjList.get(i);
                 if (!object.isPickable()) {
                     person.setDirection(Direction.getOpposite(person.getDirection()));
@@ -147,7 +152,6 @@ public class Painter {
 
 	public void addItem(Pane root, GameObject g) {
         if (g != null) {
-            System.out.println("adding dropped key");
             Rectangle item = new Rectangle(g.getPosX(), g.getPosY(), Constants.OBJ_SIZE, Constants.OBJ_SIZE);
             if (g.getType() == "Key") {
                 item.setFill(Color.YELLOW);

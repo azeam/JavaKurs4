@@ -27,10 +27,12 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             "https://www.bufonaturvard.se/images/hero.png";
         private Image heroImage;
         private Node  hero;
+        Painter painter;
         boolean running, goNorth, goSouth, goEast, goWest;
         Pane root = new Pane();
 
-        public Gui(Stage stage) {
+        public Gui(Stage stage, Painter painter) {
+            this.painter = painter;
             Canvas canvas = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
             Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
             background = canvasBG.getGraphicsContext2D();
@@ -40,8 +42,6 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
             Group dungeon = new Group(hero);
 
-            moveHeroTo(Constants.WINDOW_WIDTH / 2, Constants.ROOM_HEIGHT / 2);
-
             root.setFocusTraversable(true);
             root.getChildren().add(canvasBG);
             root.getChildren().add(canvas);
@@ -49,6 +49,17 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             Scene scene = new Scene(root, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT, Color.GREEN);
 
             dungeon.requestFocus();
+            setHeroMovement(dungeon);
+            moveHeroTo(Constants.MARGIN + Constants.ROOM_WIDTH / 2, Constants.MARGIN + Constants.ROOM_HEIGHT / 2);
+
+            stage.setResizable(false);
+            stage.setTitle("The Game");
+            stage.setOnCloseRequest(e -> System.exit(0));
+            stage.setScene(scene);
+            stage.show();
+        }
+
+        private void setHeroMovement(Group dungeon) {
             dungeon.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent event) {
@@ -58,6 +69,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         case LEFT:  goWest  = true; break;
                         case RIGHT: goEast  = true; break;
                         case SHIFT: running = true; break;
+                        default: break;
                     }
                 }
             });
@@ -71,6 +83,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         case LEFT:  goWest  = false; break;
                         case RIGHT: goEast  = false; break;
                         case SHIFT: running = false; break;
+                        default: break;
                     }
                 }
             });
@@ -90,20 +103,11 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 }
             };
             timer.start();
-
-            
-
-            stage.setResizable(false);
-            stage.setTitle("The Game");
-            stage.setOnCloseRequest(e -> System.exit(0));
-            stage.setScene(scene);
-            stage.show();
         }
 
         private void moveHeroBy(int dx, int dy) {
             if (dx == 0 && dy == 0) return;
     
-            System.out.println(dx);
             final double cx = hero.getBoundsInParent().getWidth()  / 2;
             final double cy = hero.getBoundsInParent().getHeight() / 2;
     
@@ -117,45 +121,42 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             final double cx = hero.getBoundsInParent().getWidth()  / 2;
             final double cy = hero.getBoundsInParent().getHeight() / 2;
     
-            if (x - cx >= 0 &&
-                x + cx <= Constants.WINDOW_WIDTH &&
-                y - cy >= 0 &&
-                y + cy <= Constants.WINDOW_HEIGHT) {
-                    hero.setTranslateX(x - cx);
+            if (!painter.wallCollision((int) (x - cx), (int) (y - cy), Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)) {
                     hero.relocate(x - cx, y - cy);
+                    hero.toFront(); // TODO: not working, not important after setting up collision and pause for pickup
             }
         }
 
         
-        public void setShowObjects(Painter painter, ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
-                painter.paint(this.root, personGroup, roomGroup);
+        public void setShowObjects(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+                this.painter.paint(this.root, personGroup, roomGroup);
         }
 
-        public void setUpPerson(Painter painter, ArrayList<Npc> personGroup) {
-            painter.setUpPerson(this.root, personGroup);
+        public void setUpPerson(ArrayList<Npc> personGroup) {
+            this.painter.setUpPerson(this.root, personGroup);
         }
 
-		public void setUpWalls(Painter painter, ArrayList<Room> roomGroup) {
+		public void setUpWalls(ArrayList<Room> roomGroup) {
             for (int i = 1; i < roomGroup.size(); i++) {
                 if (roomGroup.get(i).getRoomId() %2 == 0) {
-                    painter.setUpWalls(background, roomGroup.get(i).getRoomId(), "up");
+                    this.painter.setUpWalls(background, roomGroup.get(i).getRoomId(), "up");
                 }
                 else {
-                    painter.setUpWalls(background, roomGroup.get(i).getRoomId(), "down");
+                    this.painter.setUpWalls(background, roomGroup.get(i).getRoomId(), "down");
                 }
             }
 		}
 
-        public void addItem(Painter painter, GameObject gameObject) {
-            painter.addItem(root, gameObject);
+        public void addItem(GameObject gameObject) {
+            this.painter.addItem(this.root, gameObject);
         }
         
-		public void setUpItems(Painter painter, ArrayList<Room> roomGroup) {
-            painter.setUpItems(this.root, roomGroup);
+		public void setUpItems(ArrayList<Room> roomGroup) {
+            this.painter.setUpItems(this.root, roomGroup);
 		}
 
-		public boolean itemCollision(Painter painter, Npc person, Room room, int newX, int newY) {
-			return painter.itemCollision(root, person, room, newX, newY);
+		public boolean itemCollision(Npc person, Room room, int newX, int newY) {
+			return this.painter.itemCollision(this.root, person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
 		}
     
     }
