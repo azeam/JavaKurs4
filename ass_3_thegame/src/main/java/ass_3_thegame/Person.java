@@ -16,24 +16,21 @@ import ass_3_thegame.factories.GameObjectFactory;
     */
 
 public class Person implements Npc {
-    int posX;
-    int posY;
-    int curRoom;
-    Inventory inventory;
-    Direction direction;
-    String npcName;
-    Painter painter;
+    private int posX, posY, curRoom;
+    private Inventory inventory;
+    private Direction direction;
+    private String npcName;
+    private Painter painter;
 
     public Person(String name, Painter painter) {
         this.npcName = name;
         this.painter = painter;
-        makeInventory();
+        this.inventory = new Inventory(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC, "npc");
         setStartPosition();
         setCurRoom();
     }
 
     private void setStartPosition() {
-
         // TODO: does not seem to work, check why - should be fixed, confirm
         do {
             System.out.println(this.npcName + " set position to " + this.posX + this.posY);
@@ -41,17 +38,6 @@ public class Person implements Npc {
             this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_HEIGHT, Constants.ROOM_HEIGHT - Constants.NPC_HEIGHT + Constants.MARGIN);            
         } while (painter.wallCollision(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT) || painter.itemCollision(null, null, null, this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT));
         direction = Direction.getRandom();
-    }
-
-    private void makeInventory() {
-        Inventory inv = new Inventory(Constants.INV_SIZE_NPC);
-        int randomNumItems = ThreadLocalRandom.current().nextInt(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC + 1);
-        GameObjectFactory gameObjectFactory = new GameObjectFactory();
-        ArrayList<GameObject> gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true);
-        for (GameObject obj: gameObjectGroup) {
-            inv.addToInventory(inv, obj); 
-        }
-        this.inventory = inv;
     }
 
     @Override
@@ -80,7 +66,7 @@ public class Person implements Npc {
     }
 
     @Override
-    public String npcName() {
+    public String getName() {
         return this.npcName;
     }
 

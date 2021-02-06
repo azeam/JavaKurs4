@@ -20,7 +20,9 @@ public class Constants {
                             NUM_ROOMS = 4, // 2 min
                             WINDOW_WIDTH = NUM_ROOMS * ROOM_WIDTH + 2 * MARGIN,
                             ALL_ROOMS_WIDTH = NUM_ROOMS * ROOM_WIDTH,
-	                        PLAYER_WIDTH = 40,
-                            PLAYER_HEIGHT = 38;
+	                        PLAYER_WIDTH = 40, // set to img values for hitbox
+                            PLAYER_HEIGHT = 38; // set to img values for hitbox
+
+	public static final String PLAYER_NAME = "Azeam";
 
 }

@@ -67,7 +67,7 @@ public class Update implements Runnable {
                         int behindX = behind.getX() > 0 ? person.getPosX() - behind.getX() * Constants.OBJ_SIZE : person.getPosX() - behind.getX() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
                         int behindY = behind.getY() > 0 ? person.getPosY() - behind.getY() * Constants.OBJ_SIZE : person.getPosY() - behind.getY() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
                         
-                        System.out.println(person.npcName() + " attempting drop off at " + behindX + " " + behindY);
+                        System.out.println(person.getName() + " attempting drop off at " + behindX + " " + behindY);
                         GameObject item = person.getInventory().getInventory()[0];
                         if (person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(),
                                 "npcDropoff", behindX, behindY)) {
@@ -96,7 +96,7 @@ public class Update implements Runnable {
         person.setCurRoom();
 
         int room = person.getCurRoom();
-     //   System.out.println(person.npcName() + " is in room: " + room); 
+     //   System.out.println(person.getName() + " is in room: " + room); 
     }
     
 }

@@ -27,9 +27,9 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             "https://www.bufonaturvard.se/images/hero.png";
         private Image heroImage;
         private Node  hero;
-        Painter painter;
-        boolean running, goNorth, goSouth, goEast, goWest;
-        Pane root = new Pane();
+        private Painter painter;
+        private boolean running, goNorth, goSouth, goEast, goWest;
+        private Pane root = new Pane();
 
         public Gui(Stage stage, Painter painter) {
             this.painter = painter;
@@ -59,6 +59,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             stage.show();
         }
 
+        // hero movement based on https://gist.github.com/jewelsea/8321740
         private void setHeroMovement(Group dungeon) {
             dungeon.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
@@ -121,7 +122,8 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             final double cx = hero.getBoundsInParent().getWidth()  / 2;
             final double cy = hero.getBoundsInParent().getHeight() / 2;
     
-            if (!painter.wallCollision((int) (x - cx), (int) (y - cy), Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)) {
+            if (!painter.wallCollision((int) (x - cx), (int) (y - cy), Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)
+            && !painter.itemCollision(null, null, null, (int) (x - cx), (int) (y - cy), Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)) {
                     hero.relocate(x - cx, y - cy);
                     hero.toFront(); // TODO: not working, not important after setting up collision and pause for pickup
             }

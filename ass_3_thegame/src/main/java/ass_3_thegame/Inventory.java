@@ -1,10 +1,14 @@
 package ass_3_thegame;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import ass_3_thegame.factories.GameObjectFactory;
 
 public class Inventory {
     private GameObject[] inventory;
@@ -14,9 +18,10 @@ public class Inventory {
         return this.maxItems;
     }
 
-    public Inventory(int maxItems) {
-        this.inventory = new GameObject[maxItems];
-        this.maxItems = maxItems;
+    public Inventory(int min, int max, String owner) {
+        this.inventory = new GameObject[max];
+        this.maxItems = max;
+        setStartInventory(min, max, owner);
     }
 
     public GameObject[] getInventory() {
@@ -26,6 +31,21 @@ public class Inventory {
     public void setInventory(GameObject[] inventory) {
         this.inventory = inventory;
     }
+
+    public void setStartInventory(int min, int max, String owner) {
+        int randomNumItems = ThreadLocalRandom.current().nextInt(min, max + 1);
+        GameObjectFactory gameObjectFactory = new GameObjectFactory();
+        ArrayList<GameObject> gameObjectGroup = null;
+        switch (owner) {
+            case "player": gameObjectGroup = gameObjectFactory.createGroup(0, true); break;
+            case "room": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false); break;
+            case "npc": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true); break;
+            default: break;
+        }
+        for (GameObject obj: gameObjectGroup) {
+            addToInventory(this, obj); 
+        }
+	}
 
     public boolean addToInventory(Inventory inv, GameObject gameObject) {
         GameObject[] objArray = inv.getInventory();

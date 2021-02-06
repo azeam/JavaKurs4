@@ -21,8 +21,17 @@ public class GameObject {
             int select = random.nextInt(types.length); 
             this.type = types[select];    
         }
-        this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ALL_ROOMS_WIDTH - Constants.OBJ_SIZE + Constants.MARGIN);
-        this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ROOM_HEIGHT - Constants.OBJ_SIZE + Constants.MARGIN); 
+
+        // TODO: test this, item should not be placed where char is - should be fixed
+        do {
+            this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ALL_ROOMS_WIDTH - Constants.OBJ_SIZE + Constants.MARGIN);
+            this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ROOM_HEIGHT - Constants.OBJ_SIZE + Constants.MARGIN); 
+        } while (this.posX > Constants.MARGIN + Constants.ROOM_WIDTH / 2 - Constants.PLAYER_WIDTH &&
+                 this.posX < Constants.MARGIN + Constants.ROOM_WIDTH / 2 + Constants.PLAYER_WIDTH && 
+                 this.posY > Constants.MARGIN + Constants.ROOM_HEIGHT / 2 - Constants.PLAYER_HEIGHT &&
+                 this.posY < Constants.MARGIN + Constants.ROOM_HEIGHT / 2 + Constants.PLAYER_HEIGHT);
+        
+
         if (this.type == "Key") {
             this.pickable = true;  
         }
