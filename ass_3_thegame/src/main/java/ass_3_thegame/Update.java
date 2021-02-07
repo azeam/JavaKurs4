@@ -25,7 +25,7 @@ public class Update implements Runnable {
         roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
         
         gui.setUpWalls(roomGroup); // set up walls and items before persons to check for wall collision
-        gui.setUpInventory(player.getInventory(), true);
+        gui.setUpInventory(player.getInventory(), true, player);
         gui.setUpItems(roomGroup);
         gui.setRoomGroup(roomGroup);
         namesList = names.getRandomNames(Constants.NUM_NPCS);
@@ -45,7 +45,7 @@ public class Update implements Runnable {
             @Override
             public void handle(long now) {
                 if (!Constants.GL_PAUSED) {
-                    gui.setUpInventory(null, false);
+                    gui.setUpInventory(null, false, null);
                     Direction curDir;
                     int newX, newY;
                     Room room;
@@ -59,7 +59,7 @@ public class Update implements Runnable {
                         if (gui.itemCollision(person, room, newX, newY)) {}
                         else if (gui.playerCollision(person, room, newX, newY)) {
                             Constants.GL_PAUSED = true;
-                            gui.setUpInventory(person.getInventory(), false);
+                            gui.setUpInventory(person.getInventory(), false, person);
                         }
                         else if (gui.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
                             person.setDirection(Direction.getOpposite(person.getDirection()));

@@ -24,6 +24,12 @@ public class Constants {
 	                        PLAYER_WIDTH = 40, // set to img values for hitbox
                             PLAYER_HEIGHT = 38; // set to img values for hitbox
 
-	public static final String PLAYER_NAME = "Azeam";
+    public static final String  
+                            PLAYER_NAME = "Azeam",
+                            HERO_IMAGE_LOC = "https://www.bufonaturvard.se/images/hero.png",
+                            MONSTER_IMG_LOC = "https://www.bufonaturvard.se/images/monster2.png",
+                            MONSTER_IMG_ITEM_LOC = "https://www.bufonaturvard.se/images/monster_item2.png",
+                            KEY_IMAGE_LOC = "https://www.bufonaturvard.se/images/key.png",
+                            EXCHANGE_IMAGE_LOC = "https://www.bufonaturvard.se/images/exchange.png";
 
 }

@@ -24,8 +24,6 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
     public class Gui {
         private GraphicsContext background;
-        private static final String HERO_IMAGE_LOC =
-            "https://www.bufonaturvard.se/images/hero.png";
         private Image heroImage;
         private Node  hero;
         private Painter painter;
@@ -41,7 +39,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
             this.background = canvasBG.getGraphicsContext2D();
 
-            heroImage = new Image(HERO_IMAGE_LOC);
+            heroImage = new Image(Constants.HERO_IMAGE_LOC);
             hero = new ImageView(heroImage);
 
             Group dungeon = new Group(hero);
@@ -148,13 +146,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
                     if (room.getInventory().exchangeItem(hitObject, player.getInventory(), "playerPickup", newX, newY)) {   
                         painter.removeObj(this.root, hitObject, hitNode);        
-                        setUpInventory(player.getInventory(), true);
+                        setUpInventory(player.getInventory(), true, player);
                     }
                     
                 }
-            }
-            else {
-                Constants.GL_PAUSED = false;
             }
         }
 
@@ -198,10 +193,9 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             return this.painter.playerNpcCollision(this.player, person, newX, newY);
 		}
 
-		public void setUpInventory(Inventory inventory, boolean isPlayer) {
-            System.out.println("setup " + Arrays.asList(inventory));
+		public void setUpInventory(Inventory inventory, boolean isPlayer, Object owner) {
             if (inventory == null) {
-                painter.showInventory(this.root, this.background, 0, 0, null, null);   
+                painter.showInventory(this.root, this.background, 0, 0, null, null, null, null, this);   
                 return;                 
             }
             int x = isPlayer ? Constants.WINDOW_WIDTH / 2 + Constants.MARGIN : Constants.MARGIN;
@@ -209,10 +203,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             
             for (int i = 0; i < inventory.getInventory().length; i++) {       
                 if (inventory.getInventory()[i] != null) {
-                    painter.showInventory(this.root, this.background, x + (i * (Constants.OBJ_SIZE + 15)), y, inventory.getInventory()[i], inventory.getOwnerName());                    
+                    painter.showInventory(this.root, this.background, x + (i * (Constants.OBJ_SIZE + 15)), y, inventory.getInventory()[i], inventory.getOwnerName(), owner, player, this);                    
                 }
                 else {
-                    painter.showInventory(this.root, this.background, x + (i * (Constants.OBJ_SIZE + 15)), y, null, inventory.getOwnerName());
+                    painter.showInventory(this.root, this.background, x + (i * (Constants.OBJ_SIZE + 15)), y, null, inventory.getOwnerName(), owner, player, this);
                 }
             }
 		}

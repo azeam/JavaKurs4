@@ -5,17 +5,20 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import javafx.application.Platform;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-public final class Painter {    
+public final class Painter {
     static Group walls = new Group();
 
     private Rectangle top, bottom, left, right, inner, nodeWall, rectPerson, nodeItem;
@@ -24,30 +27,31 @@ public final class Painter {
     private List<GameObject> itemsObjList = new ArrayList<GameObject>();
 
     private Shape intersect;
-    private static final Image monsterImage = new Image("https://www.bufonaturvard.se/images/monster2.png");
-    private static final Image monsterItemImage = new Image("https://www.bufonaturvard.se/images/monster_item2.png");
+    private static final Image monsterImage = new Image(Constants.MONSTER_IMG_LOC);
+    private static final Image monsterItemImage = new Image(Constants.MONSTER_IMG_ITEM_LOC);
 
     public void paint(Pane root, ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
         for (int i = 0; i < personGroup.size(); i++) {
             Npc person = personGroup.get(i);
             if (person.isCarrying()) {
                 personsList.get(i).setImage(monsterItemImage);
-            }
-            else {
+            } else {
                 personsList.get(i).setImage(monsterImage);
             }
             personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
-            personsList.get(i).setTranslateY(personGroup.get(i).getPosY());  
-                                 
+            personsList.get(i).setTranslateY(personGroup.get(i).getPosY());
+
         }
     }
 
-	public void showInventory(Pane root, GraphicsContext gc, int x, int y, GameObject gameObject, String owner) {
+    public void showInventory(Pane root, GraphicsContext gc, int x, int y, GameObject gameObject, String owner, Object ownerType, Player player, Gui gui) {
         if (owner == null) {
-            gc.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN, Constants.ROOM_HEIGHT);
+            gc.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
+                    Constants.ROOM_HEIGHT);
             Platform.runLater(() -> {
-                root.getChildren().remove(root.lookup("#npcItem"));    
-            });    
+                root.getChildren().remove(root.lookup("#npcItem"));
+                root.getChildren().remove(root.lookup("#exchangeImage"));
+            });
             return;
         }
 
@@ -55,21 +59,46 @@ public final class Painter {
         gc.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
 
         if (owner == Constants.PLAYER_NAME) {
-            gc.fillText("Inventory of " + owner, Constants.WINDOW_WIDTH / 2 + Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
-        }
-        else {
+            gc.fillText("Inventory of " + owner, Constants.WINDOW_WIDTH / 2 + Constants.MARGIN,
+                    Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
+        } else {
             gc.fillText("Inventory of " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
-        }        
+
+        }
         if (gameObject != null) {
             String type = gameObject.getType();
             if (type == "Key") {
-                Image image = new Image("https://www.bufonaturvard.se/images/key.png");
+                Image image = new Image(Constants.KEY_IMAGE_LOC);
                 ImageView itemImg = new ImageView(image);
                 itemImg.setX(x);
                 itemImg.setY(y);
                 itemImg.setId("npcItem");
                 if (owner == Constants.PLAYER_NAME) {
                     itemImg.setId("playerItem");
+                }
+                if (ownerType instanceof Npc) {
+                    Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
+                    ImageView exImgView = new ImageView(exImage);
+                    exImgView.setX(Constants.WINDOW_WIDTH / 2);
+                    exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT);
+                    exImgView.setId("exchangeImage");
+                    exImgView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            if (ownerType instanceof Npc) {
+                                Npc person = (Npc) ownerType;
+                                Inventory inv = person.getInventory();
+                                if (inv.exchangeItem(gameObject, player.getInventory(), "not important", 0, 0)) {
+                                    gui.setUpInventory(player.getInventory(), true, player);
+                                }
+                            }
+                            // TODO: exchange item
+                            // TODO: set hitbox, transparent area does not work
+                        }
+                    });
+                    Platform.runLater(() -> {
+                        root.getChildren().add(exImgView); 
+                    });
                 }
                 Platform.runLater(() -> {
                     root.getChildren().add(itemImg);    
