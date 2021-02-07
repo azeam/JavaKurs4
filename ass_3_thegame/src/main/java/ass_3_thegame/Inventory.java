@@ -13,15 +13,21 @@ import ass_3_thegame.factories.GameObjectFactory;
 public class Inventory {
     private GameObject[] inventory;
     private int maxItems;
+    private String ownerName;
 
     public int getMaxItems() {
         return this.maxItems;
     }
 
-    public Inventory(int min, int max, String owner) {
+    public Inventory(int min, int max, String owner, String ownerName) {
         this.inventory = new GameObject[max];
         this.maxItems = max;
+        this.ownerName = ownerName;
         setStartInventory(min, max, owner);
+    }
+
+    public String getOwnerName() {
+        return this.ownerName;
     }
 
     public GameObject[] getInventory() {

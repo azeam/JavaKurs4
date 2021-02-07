@@ -1,9 +1,10 @@
 package ass_3_thegame;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -30,13 +31,15 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         private Painter painter;
         private boolean running, goNorth, goSouth, goEast, goWest;
         private Pane root = new Pane();
-        private Player player = new Player();
+        private Player player;
+        private ArrayList<Room> roomGroup;
 
-        public Gui(Stage stage, Painter painter) {
+        public Gui(Stage stage, Painter painter, Player player) {
             this.painter = painter;
+            this.player = player;
             Canvas canvas = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
             Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
-            background = canvasBG.getGraphicsContext2D();
+            this.background = canvasBG.getGraphicsContext2D();
 
             heroImage = new Image(HERO_IMAGE_LOC);
             hero = new ImageView(heroImage);
@@ -47,7 +50,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             root.getChildren().add(canvasBG);
             root.getChildren().add(canvas);
             root.getChildren().add(dungeon);
-            Scene scene = new Scene(root, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT, Color.GREEN);
+            Scene scene = new Scene(root, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT, Color.BLACK);
 
             dungeon.requestFocus();
             setHeroMovement(dungeon);
@@ -125,9 +128,11 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
     
             int newX = (int) (x - cx);
             int newY = (int) (y - cy);
-            GameObject hitItem = painter.getHitItem(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            Object[] hitItem = painter.getHitItem(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            GameObject hitObject = (GameObject) hitItem[0];
+            Node hitNode = (Node) hitItem[1];
             if (!painter.wallCollision(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)
-            && hitItem == null) {
+            && hitObject == null) {
                     player.setPosX(newX);
                     player.setPosY(newY);
 
@@ -135,12 +140,17 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     hero.toFront(); // TODO: not working, not important after setting up collision and pause for pickup
                     Constants.GL_PAUSED = false;
             }
-            else if (hitItem != null) {
-                if (hitItem.isPickable()) {
-                    System.out.println("player walked on key");
+            else if (hitObject != null) {
+                if (hitObject.isPickable()) {
                     Constants.GL_PAUSED = true;
+                    player.setCurRoom();
+                    Room room = roomGroup.get(player.getCurRoom() - 1);
 
-                    // TODO: show inventory/exchange dialog, set up better pause state
+                    if (room.getInventory().exchangeItem(hitObject, player.getInventory(), "playerPickup", newX, newY)) {   
+                        painter.removeObj(this.root, hitObject, hitNode);        
+                        setUpInventory(player.getInventory(), true);
+                    }
+                    
                 }
             }
             else {
@@ -187,7 +197,31 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 		public boolean playerCollision(Npc person, Room room, int newX, int newY) {
             return this.painter.playerNpcCollision(this.player, person, newX, newY);
 		}
-    
+
+		public void setUpInventory(Inventory inventory, boolean isPlayer) {
+            System.out.println("setup " + Arrays.asList(inventory));
+            if (inventory == null) {
+                painter.showInventory(this.root, this.background, 0, 0, null, null);   
+                return;                 
+            }
+            int x = isPlayer ? Constants.WINDOW_WIDTH / 2 + Constants.MARGIN : Constants.MARGIN;
+            int y = Constants.MARGIN * 3 + Constants.ROOM_HEIGHT;
+            
+            for (int i = 0; i < inventory.getInventory().length; i++) {       
+                if (inventory.getInventory()[i] != null) {
+                    painter.showInventory(this.root, this.background, x + (i * (Constants.OBJ_SIZE + 15)), y, inventory.getInventory()[i], inventory.getOwnerName());                    
+                }
+                else {
+                    painter.showInventory(this.root, this.background, x + (i * (Constants.OBJ_SIZE + 15)), y, null, inventory.getOwnerName());
+                }
+            }
+		}
+
+		public void setRoomGroup(ArrayList<Room> roomGroup) {
+            this.roomGroup = roomGroup;
+		}
+
+	
     }
 
 

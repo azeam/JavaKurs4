@@ -20,12 +20,14 @@ public class Update implements Runnable {
     private List<String> namesList;
     private ArrayList<Npc> personGroup;
 
-    public Update(Gui gui, Painter painter) {
+    public Update(Gui gui, Painter painter, Player player) {
         this.gui = gui;
         roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
+        
         gui.setUpWalls(roomGroup); // set up walls and items before persons to check for wall collision
+        gui.setUpInventory(player.getInventory(), true);
         gui.setUpItems(roomGroup);
-
+        gui.setRoomGroup(roomGroup);
         namesList = names.getRandomNames(Constants.NUM_NPCS);
         personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, painter);
         
@@ -43,19 +45,21 @@ public class Update implements Runnable {
             @Override
             public void handle(long now) {
                 if (!Constants.GL_PAUSED) {
-                    
+                    gui.setUpInventory(null, false);
                     Direction curDir;
                     int newX, newY;
                     Room room;
+                    
                     for (Npc person : personGroup) {
                         room = roomGroup.get(person.getCurRoom() - 1);
                         curDir = person.getDirection();
                         newX = person.getPosX() + curDir.getX();
                         newY = person.getPosY() + curDir.getY();
-
+                        
                         if (gui.itemCollision(person, room, newX, newY)) {}
                         else if (gui.playerCollision(person, room, newX, newY)) {
                             Constants.GL_PAUSED = true;
+                            gui.setUpInventory(person.getInventory(), false);
                         }
                         else if (gui.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
                             person.setDirection(Direction.getOpposite(person.getDirection()));
@@ -72,6 +76,7 @@ public class Update implements Runnable {
                             }
                         }
                         else {
+                            
                             changePos(person, newX, newY);
                         }
                     }

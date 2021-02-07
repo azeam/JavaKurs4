@@ -13,10 +13,10 @@ public class Game {
         spelaren göra. I Npc-TextArean ska man kunna se vilka Npc:er som
         kommer och går i rummet.
         */
-        
-        this.gui = new Gui(stage, painter);
+        Player player = new Player();
+        this.gui = new Gui(stage, painter, player);
 
-        (new Thread(new Update(this.gui, painter))).start();
+        (new Thread(new Update(this.gui, painter, player))).start();
 
         
         

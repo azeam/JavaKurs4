@@ -2,6 +2,7 @@ package ass_3_thegame;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -38,6 +39,43 @@ public final class Painter {
             personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
             personsList.get(i).setTranslateY(personGroup.get(i).getPosY());  
                                  
+        }
+    }
+
+	public void showInventory(Pane root, GraphicsContext gc, int x, int y, GameObject gameObject, String owner) {
+        if (owner == null) {
+            gc.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN, Constants.ROOM_HEIGHT);
+            Platform.runLater(() -> {
+                root.getChildren().remove(root.lookup("#npcItem"));    
+            });    
+            return;
+        }
+
+        gc.setStroke(Color.WHITE);
+        gc.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
+
+        if (owner == Constants.PLAYER_NAME) {
+            gc.fillText("Inventory of " + owner, Constants.WINDOW_WIDTH / 2 + Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
+        }
+        else {
+            gc.fillText("Inventory of " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
+        }        
+        if (gameObject != null) {
+            String type = gameObject.getType();
+            if (type == "Key") {
+                Image image = new Image("https://www.bufonaturvard.se/images/key.png");
+                ImageView itemImg = new ImageView(image);
+                itemImg.setX(x);
+                itemImg.setY(y);
+                itemImg.setId("npcItem");
+                if (owner == Constants.PLAYER_NAME) {
+                    itemImg.setId("playerItem");
+                }
+                Platform.runLater(() -> {
+                    root.getChildren().add(itemImg);    
+                });
+            }
+           
         }
     }
 
@@ -149,12 +187,8 @@ public final class Painter {
                 }
                 else if (!person.isCarrying() && object.isPickable()) {
                     if (room.getInventory().exchangeItem(object, person.getInventory(),
-                            "npcPickup", nextX, nextY)) {   
-                                itemsList.remove(item);
-                                itemsObjList.remove(object);
-                                Platform.runLater(() -> {
-                                    root.getChildren().remove(item);
-                                });  
+                            "npcPickup", nextX, nextY)) {  
+                                removeObj(root, object, item); 
                                 return true;       
                             }
                 }                  
@@ -164,8 +198,8 @@ public final class Painter {
         return false;
     }
     
-    public GameObject getHitItem(int nextX, int nextY, int hitboxX, int hitboxY) {
-        GameObject object = null;
+    public Object[] getHitItem(int nextX, int nextY, int hitboxX, int hitboxY) {
+        Object[] returnObj = new Object[2];
         int i = 0;
         for (Node item : this.itemsList) {
             nodeItem = (Rectangle) item;
@@ -175,11 +209,12 @@ public final class Painter {
 
             intersect = Shape.intersect(nodeItem, rectPerson);
             if (intersect.getBoundsInParent().getWidth() > 0) {
-                object = itemsObjList.get(i);                       
+                returnObj[0] = itemsObjList.get(i);
+                returnObj[1] = item;
             } 
             i++;
         }
-        return object;
+        return returnObj;
 	}
 
 	public void addItem(Pane root, GameObject g) {
@@ -201,6 +236,15 @@ public final class Painter {
             });
         }         
 	}
+
+	public void removeObj(Pane root, GameObject object, Node item) {
+        itemsList.remove(item);
+        itemsObjList.remove(object);
+        Platform.runLater(() -> {
+            root.getChildren().remove(item);
+        });  
+    }
+	
             
 
 }

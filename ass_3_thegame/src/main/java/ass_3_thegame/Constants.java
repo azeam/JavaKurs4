@@ -8,7 +8,7 @@ public class Constants {
                             ROOM_HEIGHT = 200,
                             NPC_WIDTH = 24,  // set to img values for hitbox
                             NPC_HEIGHT = 30, // set to img values for hitbox
-                            OBJ_SIZE = 5,
+                            OBJ_SIZE = 25,
                             WALL_SIZE = 150,
                             WALL_WIDTH = 1,
                             INV_SIZE_NPC = 1,
