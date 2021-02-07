@@ -25,7 +25,7 @@ public class Player {
     }
 
     public Player() {
-        this.inventory = new Inventory(Constants.INV_SIZE_PLAYER, Constants.INV_SIZE_PLAYER, "player", this.name);
+        this.inventory = new Inventory(Constants.INV_SIZE_PLAYER, Constants.INV_SIZE_PLAYER, "player", this.name, null);
     }
 
     public Inventory getInventory() {

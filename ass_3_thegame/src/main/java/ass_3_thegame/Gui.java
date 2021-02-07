@@ -72,7 +72,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             stage.show();
         }
 
-		public void setUpWalls(ArrayList<Room> roomGroup) {
+		public void setUpWalls() {
             for (int i = 1; i < roomGroup.size(); i++) {
                 if (roomGroup.get(i).getRoomId() %2 == 0) {
                     paintWalls(roomGroup.get(i).getRoomId(), "up");
@@ -85,7 +85,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 
 		public void setUpInventory(Inventory inventory, Object owner) {
             if (inventory == null) {
-                showInventory(0, 0, null, null, null);   
+                hideInventory(false);
                 return;                 
             }
             int x = owner instanceof Player ? Constants.WINDOW_WIDTH / 2 + Constants.MARGIN : Constants.MARGIN;
@@ -119,17 +119,27 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             }
         }
 
-        private void hideOtherInventory() {
-            background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
-            Constants.ROOM_HEIGHT);
-            Platform.runLater(() -> {
-                root.getChildren().remove(root.lookup("#npcItem"));
-                root.getChildren().remove(root.lookup("#exchangeImage"));
-            });
+        void hideInventory(boolean both) {
+            if (both) {
+                background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH - Constants.MARGIN,
+                Constants.ROOM_HEIGHT);
+                Platform.runLater(() -> {
+                    root.getChildren().remove(root.lookup("#npcItem"));
+                    root.getChildren().remove(root.lookup("#exchangeImage"));
+                    root.getChildren().remove(root.lookup("#playerItem"));
+                });
+            }
+            else {
+                background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
+                Constants.ROOM_HEIGHT);
+                Platform.runLater(() -> {
+                    root.getChildren().remove(root.lookup("#npcItem"));
+                    root.getChildren().remove(root.lookup("#exchangeImage"));
+                });
+            }
         }
 
         public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
-            hideOtherInventory();
             background.setStroke(Color.WHITE);
             background.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
     
@@ -138,7 +148,6 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
             } else if (owner != null) {
                 background.fillText("Inventory of " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
-    
             }
             if (gameObject != null) {
                 String type = gameObject.getType();
@@ -166,6 +175,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                                     // TODO: fix exchange, "npcPickup" will set the [0] item to be exchanged but item is not removed
                                     // from player inv
                                     if (npcInv.exchangeItem(gameObject, player.getInventory(), "npcPickup", 0, 0)) {
+                                        hideInventory(true);
                                         setUpInventory(player.getInventory(), player);
                                         setUpInventory(person.getInventory(), person);
                                     }
@@ -233,7 +243,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             });
         }
 
-        public void setUpItems(ArrayList<Room> roomGroup) {
+        public void setUpItems() {
             for (int i = 0; i < roomGroup.size(); i++) {
                 for (GameObject g: roomGroup.get(i).getInventory().getInventory()) {
                     if (g != null) {
@@ -414,12 +424,14 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         private void moveHeroTo(double x, double y) {
             final double cx = hero.getBoundsInParent().getWidth()  / 2;
             final double cy = hero.getBoundsInParent().getHeight() / 2;
-    
+
             int newX = (int) (x - cx);
             int newY = (int) (y - cy);
             Object[] hitItem = getHitItem(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
             GameObject hitObject = (GameObject) hitItem[0];
             Node hitNode = (Node) hitItem[1];
+            player.setCurRoom();
+
             if (!wallCollision(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)
             && hitObject == null) {
                     player.setPosX(newX);
@@ -432,7 +444,6 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             else if (hitObject != null) {
                 if (hitObject.isPickable()) {
                     Constants.GL_PAUSED = true;
-                    player.setCurRoom();
                     Room room = roomGroup.get(player.getCurRoom() - 1);
 
                     if (room.getInventory().exchangeItem(hitObject, player.getInventory(), "playerPickup", newX, newY)) {   

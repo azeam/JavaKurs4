@@ -19,11 +19,11 @@ public class Inventory {
         return this.maxItems;
     }
 
-    public Inventory(int min, int max, String owner, String ownerName) {
+    public Inventory(int min, int max, String owner, String ownerName, Room room) {
         this.inventory = new GameObject[max];
         this.maxItems = max;
         this.ownerName = ownerName;
-        setStartInventory(min, max, owner);
+        setStartInventory(min, max, owner, room);
     }
 
     public String getOwnerName() {
@@ -38,14 +38,14 @@ public class Inventory {
         this.inventory = inventory;
     }
 
-    public void setStartInventory(int min, int max, String owner) {
+    public void setStartInventory(int min, int max, String owner, Room room) {
         int randomNumItems = ThreadLocalRandom.current().nextInt(min, max + 1);
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
         ArrayList<GameObject> gameObjectGroup = null;
         switch (owner) {
-            case "player": gameObjectGroup = gameObjectFactory.createGroup(0, true); break;
-            case "room": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false); break;
-            case "npc": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true); break;
+            case "player": gameObjectGroup = gameObjectFactory.createGroup(0, true, null); break;
+            case "room": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false, room); break;
+            case "npc": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true, null); break;
             default: break;
         }
         for (GameObject obj: gameObjectGroup) {
@@ -66,11 +66,11 @@ public class Inventory {
             .stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-    //        System.out.println("arraslistcopy size: " + arrAsListCopy.size() + " objArray.length: " + objArray.length);
+            System.out.println("arraslistcopy size: " + arrAsListCopy.size() + " objArray.length: " + objArray.length);
         if (arrAsListCopy.size() < objArray.length) {
             newObjArray[arrAsListCopy.size()] = gameObject;
             inv.setInventory(newObjArray);
-            System.out.println("Added item to inventory, new inv: " + Arrays.toString(inv.getInventory()));
+            System.out.println("Added item to inventory, new " + inv.getOwnerName() + " inventory: " + Arrays.toString(inv.getInventory()));
             return true;
         }
         else {
@@ -109,6 +109,8 @@ public class Inventory {
             })
             .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
             .toArray(GameObject[]::new);
+            System.out.println("Exchanged item, new " + this.getOwnerName() + " inventory: " + Arrays.toString(this.getInventory()));
+
     }
 
 

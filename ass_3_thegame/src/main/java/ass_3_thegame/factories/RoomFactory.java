@@ -11,7 +11,7 @@ public class RoomFactory {
 
 	public ArrayList<Room> createGroup(int number) {
         ArrayList<Room> group = new ArrayList<Room>();
-        for (int i=0; i<number; i++) {
+        for (int i=0; i < number; i++) {
             group.add(createRoom(i));
         }
         return group;

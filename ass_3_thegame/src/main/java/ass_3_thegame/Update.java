@@ -23,11 +23,12 @@ public class Update implements Runnable {
     public Update(Gui gui, Player player) {
         this.gui = gui;
         roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
-        
-        gui.setUpWalls(roomGroup); // set up walls and items before persons to check for wall collision
-        gui.setUpInventory(player.getInventory(), player);
-        gui.setUpItems(roomGroup);
         gui.setRoomGroup(roomGroup);
+
+        gui.setUpWalls(); // set up walls and items before persons to check for wall collision
+        gui.setUpInventory(player.getInventory(), player);
+        gui.setUpItems();
+        
         namesList = names.getRandomNames(Constants.NUM_NPCS);
         personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, gui);
         
@@ -45,7 +46,7 @@ public class Update implements Runnable {
             @Override
             public void handle(long now) {
                 if (!Constants.GL_PAUSED) {
-                    gui.setUpInventory(null, null); // hide inventory when not trading
+                    gui.hideInventory(false); // hide inventory when not trading
                     Direction curDir;
                     int newX, newY;
                     Room room;
@@ -91,7 +92,7 @@ public class Update implements Runnable {
         person.setPosX(newX);
         person.setPosY(newY);   
         person.setCurRoom();
-
+        
         int room = person.getCurRoom();
      //   System.out.println(person.getName() + " is in room: " + room); 
     }

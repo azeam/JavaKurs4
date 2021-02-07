@@ -13,7 +13,7 @@ public class Constants {
                             WALL_WIDTH = 1,
                             INV_SIZE_NPC = 1,
                             INV_SIZE_NPC_MIN = 0,
-                            INV_SIZE_ROOM = 15,
+                            INV_SIZE_ROOM = 5,
                             INV_SIZE_ROOM_MIN = 0,
                             INV_SIZE_PLAYER = 5,
                             MARGIN = 50,

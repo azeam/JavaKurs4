@@ -25,7 +25,7 @@ public class Person implements Npc {
     public Person(String name, Gui gui) {
         this.npcName = name;
         this.gui = gui;
-        this.inventory = new Inventory(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC, "npc", name);
+        this.inventory = new Inventory(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC, "npc", name, null);
         setStartPosition();
         setCurRoom();
     }
