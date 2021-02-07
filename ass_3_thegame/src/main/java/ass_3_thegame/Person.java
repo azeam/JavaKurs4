@@ -20,11 +20,11 @@ public class Person implements Npc {
     private Inventory inventory;
     private Direction direction;
     private String npcName;
-    private Painter painter;
+    private Gui gui;
 
-    public Person(String name, Painter painter) {
+    public Person(String name, Gui gui) {
         this.npcName = name;
-        this.painter = painter;
+        this.gui = gui;
         this.inventory = new Inventory(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC, "npc", name);
         setStartPosition();
         setCurRoom();
@@ -36,7 +36,7 @@ public class Person implements Npc {
             System.out.println(this.npcName + " set position to " + this.posX + this.posY);
             this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_WIDTH, Constants.ALL_ROOMS_WIDTH - Constants.NPC_WIDTH + Constants.MARGIN);
             this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_HEIGHT, Constants.ROOM_HEIGHT - Constants.NPC_HEIGHT + Constants.MARGIN);            
-        } while (painter.wallCollision(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT) || painter.getHitItem(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)[0] != null);
+        } while (gui.wallCollision(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT) || gui.getHitItem(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)[0] != null);
         direction = Direction.getRandom();
     }
 

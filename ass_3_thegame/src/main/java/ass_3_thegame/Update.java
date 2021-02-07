@@ -20,16 +20,16 @@ public class Update implements Runnable {
     private List<String> namesList;
     private ArrayList<Npc> personGroup;
 
-    public Update(Gui gui, Painter painter, Player player) {
+    public Update(Gui gui, Player player) {
         this.gui = gui;
         roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
         
         gui.setUpWalls(roomGroup); // set up walls and items before persons to check for wall collision
-        gui.setUpInventory(player.getInventory(), true, player);
+        gui.setUpInventory(player.getInventory(), player);
         gui.setUpItems(roomGroup);
         gui.setRoomGroup(roomGroup);
         namesList = names.getRandomNames(Constants.NUM_NPCS);
-        personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, painter);
+        personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, gui);
         
         gui.setUpPerson(personGroup);
         
@@ -45,7 +45,7 @@ public class Update implements Runnable {
             @Override
             public void handle(long now) {
                 if (!Constants.GL_PAUSED) {
-                    gui.setUpInventory(null, false, null);
+                    gui.setUpInventory(null, null); // hide inventory when not trading
                     Direction curDir;
                     int newX, newY;
                     Room room;
@@ -56,10 +56,10 @@ public class Update implements Runnable {
                         newX = person.getPosX() + curDir.getX();
                         newY = person.getPosY() + curDir.getY();
                         
-                        if (gui.itemCollision(person, room, newX, newY)) {}
-                        else if (gui.playerCollision(person, room, newX, newY)) {
+                        if (gui.npcItemCollision(person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {}
+                        else if (gui.playerNpcCollision(person, newX, newY)) { 
                             Constants.GL_PAUSED = true;
-                            gui.setUpInventory(person.getInventory(), false, person);
+                            gui.setUpInventory(person.getInventory(), person);
                         }
                         else if (gui.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
                             person.setDirection(Direction.getOpposite(person.getDirection()));
@@ -80,7 +80,7 @@ public class Update implements Runnable {
                             changePos(person, newX, newY);
                         }
                     }
-                    gui.setShowObjects(personGroup, roomGroup);
+                    gui.paint(personGroup);
                 }   
             }
         };

@@ -4,7 +4,7 @@ import javafx.stage.Stage;
 
 public class Game {
     Gui gui;
-    public Game(Stage stage, Painter painter){
+    public Game(Stage stage){
         /* 
         Game kommer att vara motorn"i spelet. I konstruktorn kickar
         vi gång GUI:s och trådar. Därefter startas spelloopen som tar in och
@@ -14,9 +14,9 @@ public class Game {
         kommer och går i rummet.
         */
         Player player = new Player();
-        this.gui = new Gui(stage, painter, player);
+        this.gui = new Gui(stage, player);
 
-        (new Thread(new Update(this.gui, painter, player))).start();
+        (new Thread(new Update(this.gui, player))).start();
 
         
         
