@@ -36,7 +36,7 @@ public class Person implements Npc {
             System.out.println(this.npcName + " set position to " + this.posX + this.posY);
             this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_WIDTH, Constants.ALL_ROOMS_WIDTH - Constants.NPC_WIDTH + Constants.MARGIN);
             this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_HEIGHT, Constants.ROOM_HEIGHT - Constants.NPC_HEIGHT + Constants.MARGIN);            
-        } while (painter.wallCollision(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT) || painter.itemCollision(null, null, null, this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT));
+        } while (painter.wallCollision(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT) || painter.getHitItem(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT) != null);
         direction = Direction.getRandom();
     }
 

@@ -112,7 +112,21 @@ public final class Painter {
         return false;
     }
 
-    public boolean itemCollision(Pane root, Npc person, Room room, int nextX, int nextY, int hitboxX, int hitboxY) {
+    public boolean playerNpcCollision(Player player, Npc person, int newX, int newY) {
+                Rectangle rectPlayer = new Rectangle(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+                rectPlayer.setX(player.getPosX());
+                rectPlayer.setY(player.getPosY());              
+                rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+                rectPerson.setX(newX);
+                rectPerson.setY(newY);
+                intersect = Shape.intersect(rectPlayer, rectPerson);
+                if (intersect.getBoundsInParent().getWidth() > 0) {
+                        return true;
+                }
+                return false;
+            }
+
+    public boolean npcItemCollision(Pane root, Npc person, Room room, int nextX, int nextY, int hitboxX, int hitboxY) {
         GameObject object = null;
         int i = 0;
         for (Node item : this.itemsList) {
@@ -148,6 +162,24 @@ public final class Painter {
             i++;
         }
         return false;
+    }
+    
+    public GameObject getHitItem(int nextX, int nextY, int hitboxX, int hitboxY) {
+        GameObject object = null;
+        int i = 0;
+        for (Node item : this.itemsList) {
+            nodeItem = (Rectangle) item;
+            rectPerson = new Rectangle(hitboxX, hitboxY);
+            rectPerson.setX(nextX);
+            rectPerson.setY(nextY);
+
+            intersect = Shape.intersect(nodeItem, rectPerson);
+            if (intersect.getBoundsInParent().getWidth() > 0) {
+                object = itemsObjList.get(i);                       
+            } 
+            i++;
+        }
+        return object;
 	}
 
 	public void addItem(Pane root, GameObject g) {

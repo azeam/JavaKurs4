@@ -13,26 +13,21 @@ public class Update implements Runnable {
     // Ska implementera Runnable och starta en tråd som Regelbundet updaterar Guit
     // utifrån vad som händer i spelet.
     Gui gui;
-    static boolean paused = false;
     Names names = new Names();
     NpcFactory npcFactory = new NpcFactory();
     RoomFactory roomFactory = new RoomFactory();
     private ArrayList<Room> roomGroup;
     private List<String> namesList;
     private ArrayList<Npc> personGroup;
-    private Painter painter;
 
     public Update(Gui gui, Painter painter) {
         this.gui = gui;
-        this.painter = painter;
         roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
         gui.setUpWalls(roomGroup); // set up walls and items before persons to check for wall collision
         gui.setUpItems(roomGroup);
 
         namesList = names.getRandomNames(Constants.NUM_NPCS);
         personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, painter);
-
-        Player player = new Player();
         
         gui.setUpPerson(personGroup);
         
@@ -40,7 +35,6 @@ public class Update implements Runnable {
 
     @Override
     public void run() {
-        
         updateGui(personGroup, roomGroup);
     }
 
@@ -48,46 +42,44 @@ public class Update implements Runnable {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                Direction curDir;
-                int newX, newY;
-                Room room;
-                for (Npc person : personGroup) {
-                    room = roomGroup.get(person.getCurRoom() - 1);
-                    curDir = person.getDirection();
-                    newX = person.getPosX() + curDir.getX();
-                    newY = person.getPosY() + curDir.getY();
+                if (!Constants.GL_PAUSED) {
+                    
+                    Direction curDir;
+                    int newX, newY;
+                    Room room;
+                    for (Npc person : personGroup) {
+                        room = roomGroup.get(person.getCurRoom() - 1);
+                        curDir = person.getDirection();
+                        newX = person.getPosX() + curDir.getX();
+                        newY = person.getPosY() + curDir.getY();
 
-                    if (gui.itemCollision(person, room, newX, newY)) {}
-                    else if (painter.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
-                        person.setDirection(Direction.getOpposite(person.getDirection()));
-                    }                     
-                    else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) {
-                        Direction behind = (person.getDirection());
-                        
-                        int behindX = behind.getX() > 0 ? person.getPosX() - behind.getX() * Constants.OBJ_SIZE : person.getPosX() - behind.getX() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
-                        int behindY = behind.getY() > 0 ? person.getPosY() - behind.getY() * Constants.OBJ_SIZE : person.getPosY() - behind.getY() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
-                        
-                        System.out.println(person.getName() + " attempting drop off at " + behindX + " " + behindY);
-                        GameObject item = person.getInventory().getInventory()[0];
-                        if (person.getInventory().exchangeItem(person.getInventory().getInventory()[0], room.getInventory(),
-                                "npcDropoff", behindX, behindY)) {
-                                    gui.addItem(item);
-                                }
+                        if (gui.itemCollision(person, room, newX, newY)) {}
+                        else if (gui.playerCollision(person, room, newX, newY)) {
+                            Constants.GL_PAUSED = true;
+                        }
+                        else if (gui.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
+                            person.setDirection(Direction.getOpposite(person.getDirection()));
+                        }                     
+                        else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) {
+                            Direction behind = (person.getDirection());
+                            
+                            int behindX = behind.getX() > 0 ? person.getPosX() - behind.getX() * Constants.OBJ_SIZE : person.getPosX() - behind.getX() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
+                            int behindY = behind.getY() > 0 ? person.getPosY() - behind.getY() * Constants.OBJ_SIZE : person.getPosY() - behind.getY() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
+                            
+                            GameObject item = person.getInventory().getInventory()[0];
+                            if (person.getInventory().exchangeItem(item, room.getInventory(), "npcDropoff", behindX, behindY)) {
+                                gui.addItem(item);
+                            }
+                        }
+                        else {
+                            changePos(person, newX, newY);
+                        }
                     }
-                    else {
-                        changePos(person, newX, newY);
-                    }
-                }
-                gui.setShowObjects(personGroup, roomGroup);
+                    gui.setShowObjects(personGroup, roomGroup);
+                }   
             }
         };
-        if (paused) {
-            timer.stop();
-        }
-        else {
-            timer.start();
-        }
-       
+        timer.start();       
     }
 
     private void changePos(Npc person, int newX, int newY) {

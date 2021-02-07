@@ -3,6 +3,7 @@ package ass_3_thegame;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+// TODO: must be abstract/interface
 public class GameObject {
     // Ska hantera alla "icke-
     // levandeöbjekt i spelet (möbler, nycklar etc). GameObject ska innehålla

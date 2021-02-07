@@ -6,6 +6,23 @@ public class Player {
 
     String name = Constants.PLAYER_NAME;
     private Inventory inventory;
+    private int posX, posY;
+
+    public int getPosX() {
+        return this.posX;
+    }
+
+    public void setPosX(int posX) {
+        this.posX = posX;
+    }
+
+    public int getPosY() {
+        return this.posY;
+    }
+
+    public void setPosY(int posY) {
+        this.posY = posY;
+    }
 
     public Player() {
         this.inventory = new Inventory(Constants.INV_SIZE_PLAYER, Constants.INV_SIZE_PLAYER, "player");
@@ -14,5 +31,6 @@ public class Player {
     public Inventory getInventory() {
         return this.inventory;
     }
+
 
 }

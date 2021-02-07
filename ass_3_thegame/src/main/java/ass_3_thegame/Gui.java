@@ -30,6 +30,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         private Painter painter;
         private boolean running, goNorth, goSouth, goEast, goWest;
         private Pane root = new Pane();
+        private Player player = new Player();
 
         public Gui(Stage stage, Painter painter) {
             this.painter = painter;
@@ -122,10 +123,28 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             final double cx = hero.getBoundsInParent().getWidth()  / 2;
             final double cy = hero.getBoundsInParent().getHeight() / 2;
     
-            if (!painter.wallCollision((int) (x - cx), (int) (y - cy), Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)
-            && !painter.itemCollision(null, null, null, (int) (x - cx), (int) (y - cy), Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)) {
-                    hero.relocate(x - cx, y - cy);
+            int newX = (int) (x - cx);
+            int newY = (int) (y - cy);
+            GameObject hitItem = painter.getHitItem(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            if (!painter.wallCollision(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)
+            && hitItem == null) {
+                    player.setPosX(newX);
+                    player.setPosY(newY);
+
+                    hero.relocate(newX, newY);
                     hero.toFront(); // TODO: not working, not important after setting up collision and pause for pickup
+                    Constants.GL_PAUSED = false;
+            }
+            else if (hitItem != null) {
+                if (hitItem.isPickable()) {
+                    System.out.println("player walked on key");
+                    Constants.GL_PAUSED = true;
+
+                    // TODO: show inventory/exchange dialog, set up better pause state
+                }
+            }
+            else {
+                Constants.GL_PAUSED = false;
             }
         }
 
@@ -158,7 +177,15 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
 		}
 
 		public boolean itemCollision(Npc person, Room room, int newX, int newY) {
-			return this.painter.itemCollision(this.root, person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+			return this.painter.npcItemCollision(this.root, person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+		}
+
+		public boolean wallCollision(int newX, int newY, int npcWidth, int npcHeight) {
+			return this.painter.wallCollision(newX, newY, npcWidth, npcHeight);
+		}
+
+		public boolean playerCollision(Npc person, Room room, int newX, int newY) {
+            return this.painter.playerNpcCollision(this.player, person, newX, newY);
 		}
     
     }
