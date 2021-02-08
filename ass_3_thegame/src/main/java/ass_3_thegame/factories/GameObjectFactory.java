@@ -18,12 +18,10 @@ import ass_3_thegame.Room;
 // other chests are empty
 // for each chest make a key
 
-
-
 public class GameObjectFactory {
-
     public GameObject createGameObject(int number, boolean onlyPickable, Room room) {
         int id = ThreadLocalRandom.current().nextInt(0, 100 + 1);
+
         if (onlyPickable) {
             return new Key(room, id, false);
         }
@@ -34,7 +32,7 @@ public class GameObjectFactory {
             int randObject = options[select];
             switch (randObject) {
                 case 1: return new Key(room, id, Constants.GL_MASTER);
-                case 2: return new Container(room, id, true);
+                case 2: return new Container(room, id, Constants.GL_MASTER);
             }            
         }
         return null;

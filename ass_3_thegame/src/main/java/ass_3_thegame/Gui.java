@@ -487,7 +487,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         // TODO: try keys in inventory
                         // if id == chest id -> open
                         // remove key from inventory
-                        // update chest image
+                        // update chest image to open
                         // remove key from inventory
                         // update player inventory
                         Constants.GL_PAUSED = true;

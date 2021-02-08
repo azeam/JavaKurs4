@@ -10,7 +10,7 @@ public abstract class GameObject {
     protected boolean pickable;
     protected String type;
     private int posX, posY;
-    private int id;
+    protected int id;
 
     public GameObject(Room room, int id) {
         // TODO: test this, item should not be placed where char is - should be fixed

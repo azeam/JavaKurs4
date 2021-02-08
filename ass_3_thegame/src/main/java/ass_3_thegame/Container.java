@@ -7,15 +7,11 @@ public class Container extends GameObject {
 
     public Container(Room room, int id, boolean containsKey) {
         super(room, id);
+        this.id = id;
         this.pickable = false;
         this.type = "Chest";
         this.open = false;
-        if (containsKey) {
-            this.inventory = new Inventory(1, 1, "container", "chest in room " + room.getRoomId(), room);
-        }
-        else {
-            this.inventory = new Inventory(0, 0, "container", "chest in room " + room.getRoomId(), room);
-        }
+        this.inventory = new Inventory(1, 1, "container", "chest " + this.id + " in room " + room.getRoomId(), room);
     }
     // En subklass till GameObject som har ett Inventory. Kan vara låst eller öppet.
     public Inventory getInventory() {

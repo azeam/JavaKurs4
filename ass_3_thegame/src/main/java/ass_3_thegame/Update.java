@@ -81,7 +81,6 @@ public class Update implements Runnable {
                             }
                         }
                         else {
-                            
                             changePos(person, newX, newY);
                         }
                     }

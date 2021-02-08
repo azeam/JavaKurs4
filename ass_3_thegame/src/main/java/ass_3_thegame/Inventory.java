@@ -42,11 +42,12 @@ public class Inventory {
         int randomNumItems = ThreadLocalRandom.current().nextInt(min, max + 1);
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
         ArrayList<GameObject> gameObjectGroup = null;
+
         switch (owner) {
             case "player": gameObjectGroup = gameObjectFactory.createGroup(0, true, null); break;
             case "room": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false, room); break;
             case "npc": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true, null); break;
-            case "container": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true, null); break;
+            case "container": gameObjectGroup = gameObjectFactory.createGroup(Constants.GL_MASTER ? 1:0, true, null); break;
             default: break;
         }
         for (GameObject obj: gameObjectGroup) {

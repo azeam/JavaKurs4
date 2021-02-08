@@ -7,6 +7,7 @@ public class Key extends GameObject {
         super(room, id);
         this.pickable = true;  
         this.type = "Key";
+        this.id = id;
         this.master = master;
         System.out.println(master);
     }
