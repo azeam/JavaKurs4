@@ -31,6 +31,7 @@ public class Constants {
                             MONSTER_IMG_LOC = "https://www.bufonaturvard.se/images/monster2.png",
                             MONSTER_IMG_ITEM_LOC = "https://www.bufonaturvard.se/images/monster_item2.png",
                             KEY_IMAGE_LOC = "https://www.bufonaturvard.se/images/key.png",
-                            EXCHANGE_IMAGE_LOC = "https://www.bufonaturvard.se/images/exchange.png";
+                            EXCHANGE_IMAGE_LOC = "https://www.bufonaturvard.se/images/exchange.png",
+                            CHEST_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest.png";
 
 }

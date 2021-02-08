@@ -75,11 +75,11 @@ public class Update implements Runnable {
                         else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) {
                             Direction behind = (person.getDirection());
                             
-                            int behindX = behind.getX() > 0 ? person.getPosX() - behind.getX() * Constants.OBJ_SIZE : person.getPosX() - behind.getX() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
-                            int behindY = behind.getY() > 0 ? person.getPosY() - behind.getY() * Constants.OBJ_SIZE : person.getPosY() - behind.getY() * Constants.OBJ_SIZE + Constants.NPC_WIDTH;
+                            int behindX = person.getPosX() - behind.getX() * Constants.OBJ_SIZE;
+                            int behindY = person.getPosY() - behind.getY() * Constants.OBJ_SIZE;
                             
                             GameObject item = person.getInventory().getInventory()[0];
-                            if (person.getInventory().exchangeItem(item, room.getInventory(), "npcDropoff", behindX, behindY)) {
+                            if (!gui.wallCollision(behindX, behindY, Constants.OBJ_SIZE, Constants.OBJ_SIZE) && person.getInventory().exchangeItem(item, room.getInventory(), "npcDropoff", behindX, behindY)) {
                                 gui.addItem(item);
                             }
                         }

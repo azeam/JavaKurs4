@@ -35,14 +35,16 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         private ArrayList<Room> roomGroup;
         static Group walls = new Group();
 
-        private Rectangle top, bottom, left, right, inner, nodeWall, rectPerson, nodeItem;
+        private Rectangle top, bottom, left, right, inner, nodeWall, rectPerson;
         private List<ImageView> personsList = new ArrayList<ImageView>();
-        private List<Rectangle> itemsList = new ArrayList<Rectangle>();
+        private List<ImageView> itemsList = new ArrayList<ImageView>();
         private List<GameObject> itemsObjList = new ArrayList<GameObject>();
     
         private Shape intersect;
         private static final Image monsterImage = new Image(Constants.MONSTER_IMG_LOC);
         private static final Image monsterItemImage = new Image(Constants.MONSTER_IMG_ITEM_LOC);
+        private static final Image keyImage = new Image(Constants.KEY_IMAGE_LOC);
+        private static final Image chestImage = new Image(Constants.CHEST_IMAGE_LOC);
 
         public Gui(Stage stage, Player player) {
             this.player = player;
@@ -151,8 +153,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             if (gameObject != null) {
                 String type = gameObject.getType();
                 if (type == "Key") {
-                    Image image = new Image(Constants.KEY_IMAGE_LOC);
-                    ImageView itemImg = new ImageView(image);
+                    ImageView itemImg = new ImageView(keyImage);
                     itemImg.setX(x);
                     itemImg.setY(y);
                     background.fillText(gameObject.toString(), x, y);
@@ -165,9 +166,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         itemImg.getStyleClass().add("npcItem");
                     }
                     itemImg.setUserData(gameObject);
-                    Platform.runLater(() -> {
-                        root.getChildren().add(itemImg);    
-                    });
+                    showObj(itemImg);
                 }
             }
         }
@@ -186,9 +185,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT);
                         exImgView.getStyleClass().add("exchangeImage");
                         exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
-                        Platform.runLater(() -> {
-                            root.getChildren().add(exImgView); 
-                        });
+                        showObj(exImgView);
                         // TODO: disable selection for other keys
                     }
                 }
@@ -258,10 +255,8 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             for (int i = 0; i < personGroup.size(); i++) {
                 ImageView monster = new ImageView(monsterImage);
                 personsList.add(monster);
+                showObj(monster);
             }
-            Platform.runLater(() -> {
-                root.getChildren().addAll(personsList);    
-            });
         }
 
         public void setUpItems() {
@@ -306,13 +301,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             GameObject object = null;
             int i = 0;
             for (Node item : this.itemsList) {
-                nodeItem = (Rectangle) item;
                 rectPerson = new Rectangle(hitboxX, hitboxY);
                 rectPerson.setX(nextX);
                 rectPerson.setY(nextY);
-    
-                intersect = Shape.intersect(nodeItem, rectPerson);
-                if (intersect.getBoundsInParent().getWidth() > 0) {
+                if (item.getBoundsInParent().intersects(rectPerson.getBoundsInParent())) {
                     
                     // npc item pickup/collision
                     object = itemsObjList.get(i);
@@ -337,13 +329,11 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             Object[] returnObj = new Object[2];
             int i = 0;
             for (Node item : this.itemsList) {
-                nodeItem = (Rectangle) item;
                 rectPerson = new Rectangle(hitboxX, hitboxY);
                 rectPerson.setX(nextX);
                 rectPerson.setY(nextY);
     
-                intersect = Shape.intersect(nodeItem, rectPerson);
-                if (intersect.getBoundsInParent().getWidth() > 0) {
+                if (item.getBoundsInParent().intersects(rectPerson.getBoundsInParent())) {
                     returnObj[0] = itemsObjList.get(i);
                     returnObj[1] = item;
                 } 
@@ -354,24 +344,30 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
     
         public void addItem(GameObject g) {
             if (g != null) {
-                Rectangle item = new Rectangle(g.getPosX(), g.getPosY(), Constants.OBJ_SIZE, Constants.OBJ_SIZE);
+                ImageView itemImg = null;
                 if (g.getType() == "Key") {
-                    item.setFill(Color.YELLOW);
+                    itemImg = new ImageView(keyImage);
                 }
                 else if (g.getType() == "Chest") {
-                    item.setFill(Color.GREY);
+                    itemImg = new ImageView(chestImage);
                 }
                 else if (g.getType() == "Furniture") {
-                    item.setFill(Color.WHITE);
+                    itemImg = new ImageView(keyImage);
                 }
-                itemsList.add(item);
+                itemImg.setX(g.getPosX());
+                itemImg.setY(g.getPosY());
+                itemsList.add(itemImg);
                 itemsObjList.add(g);
-                Platform.runLater(() -> {
-                    root.getChildren().add(item);
-                });
+                showObj(itemImg);
             }         
         }
     
+        private void showObj(Node node) {
+            Platform.runLater(() -> {
+                root.getChildren().add(node);
+            });
+        }
+
         public void removeObj(GameObject object, Node item) {
             this.itemsList.remove(item);
             this.itemsObjList.remove(object);
