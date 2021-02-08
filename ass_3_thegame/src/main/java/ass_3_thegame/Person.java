@@ -1,9 +1,6 @@
 package ass_3_thegame;
 
-import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
-
-import ass_3_thegame.factories.GameObjectFactory;
 
  /* 
         En person är Npc - dessa ska lagras i lista av något slag och

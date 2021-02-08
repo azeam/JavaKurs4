@@ -7,6 +7,7 @@ public class Player {
     String name = Constants.PLAYER_NAME;
     private Inventory inventory;
     private int posX, posY, curRoom;
+    private GameObject selectedObject;
 
     public int getPosX() {
         return this.posX;
@@ -45,6 +46,14 @@ public class Player {
                 this.curRoom = i + 1;
             }
         }
+    }
+
+	public void setSelectedPlayerObject(GameObject selObj) {
+        this.selectedObject = selObj;
+    }
+    
+    public GameObject getSelectedPlayerObject() {
+        return this.selectedObject;
     }
 
 }

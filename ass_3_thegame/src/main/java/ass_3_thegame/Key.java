@@ -2,8 +2,10 @@ package ass_3_thegame;
 
 public class Key extends GameObject {
 
-    public Key(boolean onlyPickable, Room room) {
-        super(onlyPickable, room);
+    public Key(Room room) {
+        super(room);
+        this.pickable = true;  
+        this.type = "Key";
         // TODO Auto-generated constructor stub
     }
     // En subklass till GameObject vars objekt används för att låsa

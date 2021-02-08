@@ -47,10 +47,9 @@ public enum Direction {
 
     private static int getRandomOf(int first, int second, int third) {
         int i;
-        i = ThreadLocalRandom.current().nextInt(0, 7 + 1);
-        while (i != first && i != second && i != third) {
+        do {
             i = ThreadLocalRandom.current().nextInt(0, 7 + 1);
-        }   
+        } while (i != first && i != second && i != third);  
         return i;
     }
 }

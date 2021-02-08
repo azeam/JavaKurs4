@@ -2,6 +2,7 @@ package ass_3_thegame;
 
 public class Constants {
     static boolean GL_PAUSED = false;
+	protected static Npc GL_NPC_HIT;
     public final static int 
                             WINDOW_HEIGHT = 800,
                             ROOM_WIDTH = 300,

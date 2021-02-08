@@ -8,7 +8,7 @@ public class Room {
 
     public Room(int roomId) {
         this.roomId = roomId;
-        this.roomName = "Room" + roomId;
+        this.roomName = "Room " + (roomId + 1);
         this.inventory = new Inventory(Constants.INV_SIZE_ROOM_MIN, Constants.INV_SIZE_ROOM, "room", this.roomName, this);
     }
 

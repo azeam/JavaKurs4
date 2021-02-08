@@ -115,26 +115,25 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 }
                 personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
                 personsList.get(i).setTranslateY(personGroup.get(i).getPosY());
-    
             }
         }
 
-        void hideInventory(boolean both) {
+        public void hideInventory(boolean both) {
             if (both) {
                 background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH - Constants.MARGIN,
                 Constants.ROOM_HEIGHT);
                 Platform.runLater(() -> {
-                    root.getChildren().remove(root.lookup("#npcItem"));
-                    root.getChildren().remove(root.lookup("#exchangeImage"));
-                    root.getChildren().remove(root.lookup("#playerItem"));
+                    root.getChildren().remove(root.lookup(".npcItem"));
+                    root.getChildren().remove(root.lookup(".exchangeImage"));
+                    root.getChildren().remove(root.lookup(".playerItem"));
                 });
             }
             else {
                 background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
                 Constants.ROOM_HEIGHT);
                 Platform.runLater(() -> {
-                    root.getChildren().remove(root.lookup("#npcItem"));
-                    root.getChildren().remove(root.lookup("#exchangeImage"));
+                    root.getChildren().remove(root.lookup(".npcItem"));
+                    root.getChildren().remove(root.lookup(".exchangeImage"));
                 });
             }
         }
@@ -142,7 +141,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
             background.setStroke(Color.WHITE);
             background.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
-    
+
             if (owner == Constants.PLAYER_NAME) {
                 background.fillText("Inventory of " + owner, Constants.WINDOW_WIDTH / 2 + Constants.MARGIN,
                         Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
@@ -156,44 +155,66 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     ImageView itemImg = new ImageView(image);
                     itemImg.setX(x);
                     itemImg.setY(y);
-                    itemImg.setId("npcItem");
+                    background.fillText(gameObject.toString(), x, y);
+                    itemImg.getStyleClass().clear();
                     if (owner == Constants.PLAYER_NAME) {
-                        itemImg.setId("playerItem");
+                        itemImg.getStyleClass().add("playerItem");
+                        itemImg.setOnMouseClicked(inventoryItemClicked(itemImg, ownerType, gameObject));
+                    } 
+                    else if (ownerType instanceof Npc) {
+                        itemImg.getStyleClass().add("npcItem");
                     }
-                    if (ownerType instanceof Npc) {
-                        Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
-                        ImageView exImgView = new ImageView(exImage);
-                        exImgView.setX(Constants.WINDOW_WIDTH / 2);
-                        exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT);
-                        exImgView.setId("exchangeImage");
-                        exImgView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent event) {
-                                if (ownerType instanceof Npc) {
-                                    Npc person = (Npc) ownerType;
-                                    Inventory npcInv = person.getInventory();
-                                    // TODO: fix exchange, "npcPickup" will set the [0] item to be exchanged but item is not removed
-                                    // from player inv
-                                    if (npcInv.exchangeItem(gameObject, player.getInventory(), "npcPickup", 0, 0)) {
-                                        hideInventory(true);
-                                        setUpInventory(player.getInventory(), player);
-                                        setUpInventory(person.getInventory(), person);
-                                    }
-                                }
-                                // TODO: exchange item
-                                // TODO: set hitbox, transparent area does not work
-                            }
-                        });
-                        Platform.runLater(() -> {
-                            root.getChildren().add(exImgView); 
-                        });
-                    }
+                    itemImg.setUserData(gameObject);
                     Platform.runLater(() -> {
                         root.getChildren().add(itemImg);    
                     });
                 }
-               
             }
+        }
+
+        private EventHandler<MouseEvent> inventoryItemClicked(ImageView itemImg, Object ownerType, GameObject gameObject) {
+            return new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {                    
+                    itemImg.setOpacity(0.5);
+                    player.setSelectedPlayerObject(gameObject);
+                    System.out.println(Constants.GL_NPC_HIT);
+                    if (Constants.GL_NPC_HIT != null) {
+                        Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
+                        ImageView exImgView = new ImageView(exImage);
+                        exImgView.setX(Constants.WINDOW_WIDTH / 2);
+                        exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT);
+                        exImgView.getStyleClass().add("exchangeImage");
+                        exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
+                        Platform.runLater(() -> {
+                            root.getChildren().add(exImgView); 
+                        });
+                        // TODO: disable selection for other keys
+                    }
+                }
+
+                private EventHandler<? super MouseEvent> exchangeItemHandler(ImageView itemImg) {
+                    return new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            Npc person = Constants.GL_NPC_HIT;
+                            Inventory npcInv = person.getInventory();
+                            GameObject itemToAddPlayer = npcInv.getInventory()[0];
+                            GameObject itemToAddNpc = player.getSelectedPlayerObject();
+                            npcInv.remove(npcInv.getInventory()[0]);
+                            player.getInventory().remove(player.getSelectedPlayerObject());
+                            npcInv.addToInventory(npcInv, itemToAddNpc);
+                            player.getInventory().addToInventory(player.getInventory(), itemToAddPlayer);
+
+                            hideInventory(true);
+                            setUpInventory(player.getInventory(), player);
+                            setUpInventory(person.getInventory(), person);
+                            person.setDirection(Direction.getOpposite(person.getDirection()));
+                        
+                        }
+                    };
+                }
+            };
         }
 
         public void paintWalls(int order, String doorLocation) {
@@ -268,18 +289,18 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         }
     
         public boolean playerNpcCollision(Npc person, int newX, int newY) {
-                    Rectangle rectPlayer = new Rectangle(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
-                    rectPlayer.setX(player.getPosX());
-                    rectPlayer.setY(player.getPosY());              
-                    rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
-                    rectPerson.setX(newX);
-                    rectPerson.setY(newY);
-                    intersect = Shape.intersect(rectPlayer, rectPerson);
-                    if (intersect.getBoundsInParent().getWidth() > 0) {
-                            return true;
-                    }
-                    return false;
-                }
+            Rectangle rectPlayer = new Rectangle(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            rectPlayer.setX(player.getPosX());
+            rectPlayer.setY(player.getPosY());              
+            rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
+            rectPerson.setX(newX);
+            rectPerson.setY(newY);
+            intersect = Shape.intersect(rectPlayer, rectPerson);
+            if (intersect.getBoundsInParent().getWidth() > 0) {
+                    return true;
+            }
+            return false;
+        }
     
         public boolean npcItemCollision(Npc person, Room room, int nextX, int nextY, int hitboxX, int hitboxY) {
             GameObject object = null;
@@ -292,10 +313,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
     
                 intersect = Shape.intersect(nodeItem, rectPerson);
                 if (intersect.getBoundsInParent().getWidth() > 0) {
-                    // just check any element for hit manually
-                    if (root == null && person == null && room == null) {
-                        return true;
-                    }
+                    
                     // npc item pickup/collision
                     object = itemsObjList.get(i);
                     if (!object.isPickable()) {
@@ -368,10 +386,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 @Override
                 public void handle(KeyEvent event) {
                     switch (event.getCode()) {
-                        case UP:    goNorth = true; break;
-                        case DOWN:  goSouth = true; break;
-                        case LEFT:  goWest  = true; break;
-                        case RIGHT: goEast  = true; break;
+                        case W:    goNorth = true; break;
+                        case S:  goSouth = true; break;
+                        case A:  goWest  = true; break;
+                        case D: goEast  = true; break;
                         case SHIFT: running = true; break;
                         default: break;
                     }
@@ -382,10 +400,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 @Override
                 public void handle(KeyEvent event) {
                     switch (event.getCode()) {
-                        case UP:    goNorth = false; break;
-                        case DOWN:  goSouth = false; break;
-                        case LEFT:  goWest  = false; break;
-                        case RIGHT: goEast  = false; break;
+                        case W:    goNorth = false; break;
+                        case S:  goSouth = false; break;
+                        case A:  goWest  = false; break;
+                        case D: goEast  = false; break;
                         case SHIFT: running = false; break;
                         default: break;
                     }
@@ -431,6 +449,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             GameObject hitObject = (GameObject) hitItem[0];
             Node hitNode = (Node) hitItem[1];
             player.setCurRoom();
+            player.setSelectedPlayerObject(null);
 
             if (!wallCollision(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)
             && hitObject == null) {
@@ -438,16 +457,16 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     player.setPosY(newY);
 
                     hero.relocate(newX, newY);
-                    hero.toFront(); // TODO: not working, not important after setting up collision and pause for pickup
+                    hero.toFront(); // TODO: not working
                     Constants.GL_PAUSED = false;
             }
             else if (hitObject != null) {
                 if (hitObject.isPickable()) {
-                    Constants.GL_PAUSED = true;
                     Room room = roomGroup.get(player.getCurRoom() - 1);
 
                     if (room.getInventory().exchangeItem(hitObject, player.getInventory(), "playerPickup", newX, newY)) {   
-                        removeObj(hitObject, hitNode);        
+                        removeObj(hitObject, hitNode);  
+                        hideInventory(true);      
                         setUpInventory(player.getInventory(), player);
                     }
                     

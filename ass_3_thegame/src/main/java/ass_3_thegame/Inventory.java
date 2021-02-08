@@ -113,6 +113,23 @@ public class Inventory {
 
     }
 
+	public void remove(GameObject selected) {
+        List<GameObject> arrAsList = Arrays.asList(this.inventory);
+
+        this.inventory = arrAsList
+            .stream()
+            .map(x -> {
+                if (x == selected) {
+                    return null;
+                }
+                return x;
+            })
+            .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
+            .toArray(GameObject[]::new);
+            System.out.println("Removed item, new " + this.getOwnerName() + " inventory: " + Arrays.toString(this.getInventory()));
+
+	}
+
 
     /* 
         Ska innehålla en array av GameObjects. Arrayen ska vara an-

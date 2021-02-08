@@ -52,15 +52,22 @@ public class Update implements Runnable {
                     Room room;
                     
                     for (Npc person : personGroup) {
+                        
                         room = roomGroup.get(person.getCurRoom() - 1);
                         curDir = person.getDirection();
                         newX = person.getPosX() + curDir.getX();
                         newY = person.getPosY() + curDir.getY();
-                        
+                            
                         if (gui.npcItemCollision(person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {}
-                        else if (gui.playerNpcCollision(person, newX, newY)) { 
-                            Constants.GL_PAUSED = true;
+                        else if (gui.playerNpcCollision(person, newX, newY)) {
                             gui.setUpInventory(person.getInventory(), person);
+                            if (person.getInventory().getInventory()[0] != null) {
+                                Constants.GL_NPC_HIT = person;
+                            }
+                            else {
+                                Constants.GL_NPC_HIT = null;
+                            }
+                            Constants.GL_PAUSED = true;
                         }
                         else if (gui.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
                             person.setDirection(Direction.getOpposite(person.getDirection()));
