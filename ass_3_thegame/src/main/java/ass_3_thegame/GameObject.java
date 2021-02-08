@@ -12,10 +12,9 @@ public abstract class GameObject {
     private int posX, posY;
     private int id;
 
-    public GameObject(Room room) {
+    public GameObject(Room room, int id) {
         // TODO: test this, item should not be placed where char is - should be fixed
         // only place within room bounds
-        this.id = ThreadLocalRandom.current().nextInt(0, 100 + 1);
         if (room != null) {
             int roomNumber = room.getRoomId();    
                 do {

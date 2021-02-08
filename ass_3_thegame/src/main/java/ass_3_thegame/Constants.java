@@ -2,6 +2,7 @@ package ass_3_thegame;
 
 public class Constants {
     static boolean GL_PAUSED = false;
+    public static boolean GL_MASTER = true;
 	protected static Npc GL_NPC_HIT;
     public final static int 
                             WINDOW_HEIGHT = 800,
@@ -31,7 +32,10 @@ public class Constants {
                             MONSTER_IMG_LOC = "https://www.bufonaturvard.se/images/monster2.png",
                             MONSTER_IMG_ITEM_LOC = "https://www.bufonaturvard.se/images/monster_item2.png",
                             KEY_IMAGE_LOC = "https://www.bufonaturvard.se/images/key.png",
+                            KEY_GROUND_IMAGE_LOC = "https://www.bufonaturvard.se/images/key_ground.png",
+                            KEY_MASTER_IMAGE_LOC = "https://www.bufonaturvard.se/images/key_master.png",
                             EXCHANGE_IMAGE_LOC = "https://www.bufonaturvard.se/images/exchange.png",
-                            CHEST_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest.png";
+                            CHEST_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest.png",
+                            CHEST_OPEN_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest.png";
 
 }

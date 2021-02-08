@@ -44,7 +44,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         private static final Image monsterImage = new Image(Constants.MONSTER_IMG_LOC);
         private static final Image monsterItemImage = new Image(Constants.MONSTER_IMG_ITEM_LOC);
         private static final Image keyImage = new Image(Constants.KEY_IMAGE_LOC);
+        private static final Image keyMasterImage = new Image(Constants.KEY_MASTER_IMAGE_LOC);
+        private static final Image keyGroundImage = new Image(Constants.KEY_GROUND_IMAGE_LOC);
         private static final Image chestImage = new Image(Constants.CHEST_IMAGE_LOC);
+        private static final Image chestOpenImage = new Image(Constants.CHEST_IMAGE_LOC);
 
         public Gui(Stage stage, Player player) {
             this.player = player;
@@ -127,6 +130,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 Platform.runLater(() -> {
                     root.getChildren().remove(root.lookup(".npcItem"));
                     root.getChildren().remove(root.lookup(".exchangeImage"));
+                    root.getChildren().remove(root.lookup(".containerItem"));
                     root.getChildren().remove(root.lookup(".playerItem"));
                 });
             }
@@ -134,6 +138,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
                 Constants.ROOM_HEIGHT);
                 Platform.runLater(() -> {
+                    root.getChildren().remove(root.lookup(".containerItem"));
                     root.getChildren().remove(root.lookup(".npcItem"));
                     root.getChildren().remove(root.lookup(".exchangeImage"));
                 });
@@ -153,7 +158,11 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             if (gameObject != null) {
                 String type = gameObject.getType();
                 if (type == "Key") {
+                    Key key = (Key) gameObject;
                     ImageView itemImg = new ImageView(keyImage);
+                    if (key.isMaster()) {
+                        itemImg = new ImageView(keyMasterImage);
+                    }
                     itemImg.setX(x);
                     itemImg.setY(y);
                     background.fillText(gameObject.toString(), x, y);
@@ -164,6 +173,9 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     } 
                     else if (ownerType instanceof Npc) {
                         itemImg.getStyleClass().add("npcItem");
+                    }
+                    else if (ownerType instanceof Container) {
+                        itemImg.getStyleClass().add("containerItem");
                     }
                     itemImg.setUserData(gameObject);
                     showObj(itemImg);
@@ -219,7 +231,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             top.setX(Constants.MARGIN);
             top.setY(Constants.MARGIN);
     
-            bottom = new Rectangle(Constants.ALL_ROOMS_WIDTH, Constants.WALL_WIDTH);
+            bottom = new Rectangle(Constants.ALL_ROOMS_WIDTH + Constants.WALL_WIDTH, Constants.WALL_WIDTH);
             bottom.setX(Constants.MARGIN);
             bottom.setY(Constants.MARGIN + Constants.ROOM_HEIGHT);
            
@@ -346,13 +358,16 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             if (g != null) {
                 ImageView itemImg = null;
                 if (g.getType() == "Key") {
-                    itemImg = new ImageView(keyImage);
+                    itemImg = new ImageView(keyGroundImage);
                 }
                 else if (g.getType() == "Chest") {
-                    itemImg = new ImageView(chestImage);
-                }
-                else if (g.getType() == "Furniture") {
-                    itemImg = new ImageView(keyImage);
+                    Container chest = (Container) g;
+                    if (chest.isOpen()) {
+                        itemImg = new ImageView(chestOpenImage);
+                    }
+                    else {
+                        itemImg = new ImageView(chestImage);
+                    }
                 }
                 itemImg.setX(g.getPosX());
                 itemImg.setY(g.getPosY());
@@ -465,7 +480,19 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         hideInventory(true);      
                         setUpInventory(player.getInventory(), player);
                     }
-                    
+                }
+                else if (hitObject.getType() == "Chest") {
+                    Container chest = (Container) hitObject;
+                    if (!chest.isOpen()) {
+                        // TODO: try keys in inventory
+                        // if id == chest id -> open
+                        // remove key from inventory
+                        // update chest image
+                        // remove key from inventory
+                        // update player inventory
+                        Constants.GL_PAUSED = true;
+                        setUpInventory(chest.getInventory(), chest);    
+                    }
                 }
             }
         }

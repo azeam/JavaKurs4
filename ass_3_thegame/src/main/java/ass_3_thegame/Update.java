@@ -50,7 +50,7 @@ public class Update implements Runnable {
                     Direction curDir;
                     int newX, newY;
                     Room room;
-                    
+                    Constants.GL_NPC_HIT = null;
                     for (Npc person : personGroup) {
                         
                         room = roomGroup.get(person.getCurRoom() - 1);
@@ -63,9 +63,6 @@ public class Update implements Runnable {
                             gui.setUpInventory(person.getInventory(), person);
                             if (person.getInventory().getInventory()[0] != null) {
                                 Constants.GL_NPC_HIT = person;
-                            }
-                            else {
-                                Constants.GL_NPC_HIT = null;
                             }
                             Constants.GL_PAUSED = true;
                         }
