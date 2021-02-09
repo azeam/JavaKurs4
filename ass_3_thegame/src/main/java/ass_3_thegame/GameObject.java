@@ -2,6 +2,8 @@ package ass_3_thegame;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import javafx.scene.Node;
+
 public abstract class GameObject {
    
     protected boolean pickable;

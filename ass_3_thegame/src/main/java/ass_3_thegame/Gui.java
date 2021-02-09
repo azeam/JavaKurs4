@@ -129,7 +129,10 @@ public class Gui {
                 background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH - Constants.MARGIN,
                 Constants.ROOM_HEIGHT);
                 Platform.runLater(() -> {
-                    root.getChildren().remove(".playerItem");
+                    // needs loop because lookup only returns first item, does not work by eg. setting node to class and removing it, different reference
+                    for (int i = 0; i < Constants.INV_SIZE_PLAYER; i++) {
+                        root.getChildren().remove(root.lookup(".rightItem"));
+                    }
                 });
             }
             else {
@@ -137,9 +140,7 @@ public class Gui {
                 Constants.ROOM_HEIGHT);
             }
             Platform.runLater(() -> {
-                root.getChildren().remove(root.lookup(".containerItem"));
-                root.getChildren().remove(root.lookup(".npcItem"));
-                root.getChildren().remove(root.lookup(".exchangeImage"));
+                root.getChildren().remove(root.lookup(".leftItem"));
             });
         }
 
@@ -178,14 +179,11 @@ public class Gui {
                     
                     itemImg.getStyleClass().clear();
                     if (owner == Constants.PLAYER_NAME) {
-                        itemImg.getStyleClass().add("playerItem");
                         itemImg.setOnMouseClicked(inventoryItemClicked(itemImg, ownerType, gameObject));
+                        itemImg.getStyleClass().add("rightItem");
                     } 
-                    else if (ownerType instanceof Npc) {
-                        itemImg.getStyleClass().add("npcItem");
-                    }
-                    else if (ownerType instanceof Container) {
-                        itemImg.getStyleClass().add("containerItem");
+                    else {
+                        itemImg.getStyleClass().add("leftItem");
                     }
                     itemImg.setUserData(gameObject);
                     showObj(itemImg);
@@ -198,18 +196,24 @@ public class Gui {
             return new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {                    
-                    itemImg.setOpacity(0.5); 
+                    itemImg.setOpacity(0.2); 
                     player.setSelectedPlayerObject(gameObject);
                     System.out.println(itemImg.getStyleClass());
+                     // TODO: disable selection for other keys
+                     /*
+                        for (ImageView itemImg : itemsList) {
+                            itemImg.removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
+                        }
+                    */
                     if (Constants.GL_NPC_HIT != null) {
                         Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
                         ImageView exImgView = new ImageView(exImage);
                         exImgView.setX(Constants.WINDOW_WIDTH / 2);
                         exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT);
-                        exImgView.getStyleClass().add("exchangeImage");
+                        exImgView.getStyleClass().add("leftItem");
                         exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
                         showObj(exImgView);
-                        // TODO: disable selection for other keys
+                       
                     }
                 }
 
@@ -409,8 +413,10 @@ public class Gui {
             this.itemsList.remove(item);
             this.itemsObjList.remove(object);
             Platform.runLater(() -> {
+                System.out.println("removing object " + object.toString() + " item " + item);
                 root.getChildren().remove(item);
             });  
+            
         }
 
         // hero movement based on https://gist.github.com/jewelsea/8321740
@@ -528,7 +534,7 @@ public class Gui {
                         }
                     }
 
-                    // if player unlocks chest, take the key
+                    // if player unlocks chest, remove the key from game
                     if (chestUnlocked) {
                         chest.setOpen(true);
                         addItem(chest); // add open chest img
@@ -541,16 +547,14 @@ public class Gui {
                             chest.getInventory().remove(keyToTake); // remove from chest inv
                             this.background.fillText("MASTER KEY FOUND", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 200);
                         }     
-                        
+                                             
                     }
-                    
-                }
-                 // refresh inventory
-                 // TODO: chest needs to be set higher up or removed key will remain in place when opening 
-                 // an empty chest for some reason, but then "can't open" won't show, fix this
+                // refresh inventories
                 hideInventory(true);
                 setUpInventory(chest.getInventory(), chest); 
-                setUpInventory(player.getInventory(), player);                 
+                setUpInventory(player.getInventory(), player);    
+                }
+
             }
             else if (hitNode.getUserData() != null && hitNode.getUserData() == "door") {
                 for (GameObject playerObject : player.getInventory().getInventory()) {
