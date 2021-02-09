@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import ass_3_thegame.factories.GameObjectFactory;
 import ass_3_thegame.factories.NpcFactory;
 import ass_3_thegame.factories.RoomFactory;
 import javafx.animation.AnimationTimer;
@@ -24,7 +25,7 @@ public class Update implements Runnable {
         this.gui = gui;
         roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
         gui.setRoomGroup(roomGroup);
-
+        placeMasterKey(roomGroup);
         gui.setUpWalls(); // set up walls and items before persons to check for wall collision
         gui.setUpInventory(player.getInventory(), player);
         gui.setUpItems();
@@ -34,6 +35,25 @@ public class Update implements Runnable {
         
         gui.setUpPerson(personGroup);
         
+    }
+
+    private void placeMasterKey(ArrayList<Room> roomGroup2) {
+        List<GameObject[]> roomsInventories = new ArrayList<GameObject[]>();
+        for (Room room: roomGroup) {
+            roomsInventories.add(room.getInventory().getInventory());
+        }
+        List<Container> containers = new ArrayList<Container>();
+        for (GameObject[] inventory : roomsInventories) {
+            for (int i = 0; i < inventory.length; i++) {
+                if (inventory[i] instanceof Container) {
+                    containers.add((Container) inventory[i]);
+                }
+            }
+        }
+        int masterPos = ThreadLocalRandom.current().nextInt(0, containers.size());
+        GameObjectFactory gameObjectFactory = new GameObjectFactory();
+        GameObject masterKey = gameObjectFactory.createGameObject(true, null, true);
+        containers.get(masterPos).getInventory().addToInventory(containers.get(masterPos).getInventory(), masterKey);
     }
 
     @Override

@@ -5,7 +5,7 @@ public class Container extends GameObject {
     private boolean open;
     private Inventory inventory;
 
-    public Container(Room room, int id, boolean containsKey) {
+    public Container(Room room, int id) {
         super(room, id);
         this.id = id;
         this.pickable = false;

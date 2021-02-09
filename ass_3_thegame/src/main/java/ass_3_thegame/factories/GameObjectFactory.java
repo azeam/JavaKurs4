@@ -19,11 +19,11 @@ import ass_3_thegame.Room;
 // for each chest make a key
 
 public class GameObjectFactory {
-    public GameObject createGameObject(int number, boolean onlyPickable, Room room) {
-        int id = ThreadLocalRandom.current().nextInt(0, 100 + 1);
+    public GameObject createGameObject(boolean onlyPickable, Room room, boolean isMaster) {
+        int id = ThreadLocalRandom.current().nextInt(0, (Constants.NUM_ROOMS * Constants.INV_SIZE_ROOM / 2) + 1);
         
         if (onlyPickable) {
-            return new Key(room, id, false);
+            return new Key(room, id, isMaster);
         }
         else {
             int[] options = {1, 2};
@@ -31,8 +31,8 @@ public class GameObjectFactory {
             int select = random.nextInt(options.length); 
             int randObject = options[select];
             switch (randObject) {
-                case 1: return new Key(room, id, Constants.GL_MASTER);
-                case 2: return new Container(room, id, Constants.GL_MASTER);
+                case 1: return new Key(room, id, isMaster);
+                case 2: return new Container(room, id);
             }            
         }
         return null;
@@ -41,10 +41,7 @@ public class GameObjectFactory {
 	public ArrayList<GameObject> createGroup(int number, boolean onlyPickable, Room room) {
         ArrayList<GameObject> group = new ArrayList<GameObject>();
         for (int i=0; i<number; i++) {
-            group.add(createGameObject(number, onlyPickable, room));
-            // TODO: fix, set master key in random chest only
-            // will not make master key if first obj is chest now
-            Constants.GL_MASTER = false;
+            group.add(createGameObject(onlyPickable, room, false));
         }
         return group;
 	}
