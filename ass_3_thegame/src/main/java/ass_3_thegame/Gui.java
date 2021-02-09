@@ -47,7 +47,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         private static final Image keyMasterImage = new Image(Constants.KEY_MASTER_IMAGE_LOC);
         private static final Image keyGroundImage = new Image(Constants.KEY_GROUND_IMAGE_LOC);
         private static final Image chestImage = new Image(Constants.CHEST_IMAGE_LOC);
-        private static final Image chestOpenImage = new Image(Constants.CHEST_IMAGE_LOC);
+        private static final Image chestOpenImage = new Image(Constants.CHEST_OPEN_IMAGE_LOC);
 
         public Gui(Stage stage, Player player) {
             this.player = player;
@@ -146,15 +146,28 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
         }
 
         public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
-            background.setStroke(Color.WHITE);
-            background.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
-
+            
             if (owner == Constants.PLAYER_NAME) {
                 background.fillText("Inventory of " + owner, Constants.WINDOW_WIDTH / 2 + Constants.MARGIN,
                         Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
-            } else if (owner != null) {
+            } 
+            else if (ownerType instanceof Container) {
+                Container chest = (Container) ownerType;
+                if (!chest.isOpen()) {
+                    background.fillText("Unable to unlock " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);    
+                    return;
+                }
+                else {
+                    background.fillText("Inventory of " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);    
+                }
+            }
+            else if (owner != null) {
                 background.fillText("Inventory of " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
             }
+
+            background.setStroke(Color.WHITE);
+            background.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
+
             if (gameObject != null) {
                 String type = gameObject.getType();
                 if (type == "Key") {
@@ -189,7 +202,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 public void handle(MouseEvent event) {                    
                     itemImg.setOpacity(0.5);
                     player.setSelectedPlayerObject(gameObject);
-                    System.out.println(Constants.GL_NPC_HIT);
+                    System.out.println(itemImg.getStyleClass());
                     if (Constants.GL_NPC_HIT != null) {
                         Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
                         ImageView exImgView = new ImageView(exImage);
@@ -235,9 +248,11 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             bottom.setX(Constants.MARGIN);
             bottom.setY(Constants.MARGIN + Constants.ROOM_HEIGHT);
            
-            left = new Rectangle(Constants.WALL_WIDTH, Constants.ROOM_HEIGHT);
+            left = new Rectangle(Constants.WALL_WIDTH, Constants.ROOM_HEIGHT - Constants.DOOR_HEIGHT);
             left.setX(Constants.MARGIN);
             left.setY(Constants.MARGIN);
+
+            
            
             right = new Rectangle(Constants.WALL_WIDTH, Constants.ROOM_HEIGHT);
             right.setX(Constants.MARGIN + Constants.ALL_ROOMS_WIDTH);
@@ -362,6 +377,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 }
                 else if (g.getType() == "Chest") {
                     Container chest = (Container) g;
+                    System.out.println(chest.getPosX() + " " + chest.getPosY() + chest.isOpen());
                     if (chest.isOpen()) {
                         itemImg = new ImageView(chestOpenImage);
                     }
@@ -371,8 +387,8 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 }
                 itemImg.setX(g.getPosX());
                 itemImg.setY(g.getPosY());
-                itemsList.add(itemImg);
-                itemsObjList.add(g);
+                this.itemsList.add(itemImg);
+                this.itemsObjList.add(g);
                 showObj(itemImg);
             }         
         }
@@ -484,15 +500,39 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 else if (hitObject.getType() == "Chest") {
                     Container chest = (Container) hitObject;
                     if (!chest.isOpen()) {
-                        // TODO: try keys in inventory
-                        // if id == chest id -> open
-                        // remove key from inventory
-                        // update chest image to open
-                        // remove key from inventory
-                        // update player inventory
                         Constants.GL_PAUSED = true;
+                        boolean chestUnlocked = false;
+                        GameObject objToRemove = null;
+                        for (GameObject playersObject: player.getInventory().getInventory()) {
+                            if (playersObject instanceof Key) {
+                                Key key = (Key) playersObject;
+                                if (key.getId() == chest.getId()) {
+                                    chestUnlocked = true;
+                                    objToRemove = playersObject;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (chestUnlocked) {
+                            chest.setOpen(true);
+                            addItem(chest); // add open chest img
+                            removeObj(hitObject, hitNode); // remove locked chest img
+                            player.getInventory().remove(objToRemove); // remove key from player inv
+                            if (chest.getInventory().getInventory()[0] != null) {
+                                System.out.println("Chest contains key, taking it");
+                                GameObject keyToTake = chest.getInventory().getInventory()[0];
+                                player.getInventory().addToInventory(player.getInventory(), keyToTake); // add master key to player inv
+                                chest.getInventory().remove(keyToTake); // remove from chest inv
+                                this.background.fillText("CARRYING MASTER KEY", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 100);
+                            }     
+                        }
+                        
                         setUpInventory(chest.getInventory(), chest);    
                     }
+                     // refresh inventory
+                    hideInventory(true);
+                    setUpInventory(player.getInventory(), player);
                 }
             }
         }

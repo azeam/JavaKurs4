@@ -21,7 +21,7 @@ import ass_3_thegame.Room;
 public class GameObjectFactory {
     public GameObject createGameObject(int number, boolean onlyPickable, Room room) {
         int id = ThreadLocalRandom.current().nextInt(0, 100 + 1);
-
+        
         if (onlyPickable) {
             return new Key(room, id, false);
         }
@@ -43,6 +43,7 @@ public class GameObjectFactory {
         for (int i=0; i<number; i++) {
             group.add(createGameObject(number, onlyPickable, room));
             // TODO: fix, set master key in random chest only
+            // will not make master key if first obj is chest now
             Constants.GL_MASTER = false;
         }
         return group;

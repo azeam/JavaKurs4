@@ -1,7 +1,7 @@
 package ass_3_thegame;
 
 public class Constants {
-    static boolean GL_PAUSED = false;
+    protected static boolean GL_PAUSED = false;
     public static boolean GL_MASTER = true;
 	protected static Npc GL_NPC_HIT;
     public final static int 
@@ -24,7 +24,8 @@ public class Constants {
                             WINDOW_WIDTH = NUM_ROOMS * ROOM_WIDTH + 2 * MARGIN,
                             ALL_ROOMS_WIDTH = NUM_ROOMS * ROOM_WIDTH,
 	                        PLAYER_WIDTH = 40, // set to img values for hitbox
-                            PLAYER_HEIGHT = 38; // set to img values for hitbox
+                            PLAYER_HEIGHT = 38,  // set to img values for hitbox
+                            DOOR_HEIGHT = 50; 
 
     public static final String  
                             PLAYER_NAME = "Azeam",
@@ -36,6 +37,6 @@ public class Constants {
                             KEY_MASTER_IMAGE_LOC = "https://www.bufonaturvard.se/images/key_master.png",
                             EXCHANGE_IMAGE_LOC = "https://www.bufonaturvard.se/images/exchange.png",
                             CHEST_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest.png",
-                            CHEST_OPEN_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest.png";
+                            CHEST_OPEN_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest_open.png";
 
 }

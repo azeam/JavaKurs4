@@ -42,6 +42,7 @@ public class Update implements Runnable {
     }
 
     private void updateGui(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
+        // will safely run on java fx thread
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -91,7 +92,7 @@ public class Update implements Runnable {
         timer.start();       
     }
 
-    private void changePos(Npc person, int newX, int newY) {
+    private synchronized void changePos(Npc person, int newX, int newY) {
         person.setPosX(newX);
         person.setPosY(newY);   
         person.setCurRoom();

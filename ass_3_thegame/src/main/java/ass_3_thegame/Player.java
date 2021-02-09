@@ -13,7 +13,7 @@ public class Player {
         return this.posX;
     }
 
-    public void setPosX(int posX) {
+    public synchronized void setPosX(int posX) {
         this.posX = posX;
     }
 
@@ -21,7 +21,7 @@ public class Player {
         return this.posY;
     }
 
-    public void setPosY(int posY) {
+    public synchronized void setPosY(int posY) {
         this.posY = posY;
     }
 

@@ -27,6 +27,10 @@ public abstract class GameObject {
         } 
     }
 
+    public int getId() {
+        return this.id;
+    }
+
     public String getType() {
         return this.type;
     }
@@ -43,11 +47,11 @@ public abstract class GameObject {
         return this.posY;
     }
 
-    public void setPosX(int x) {
+    public synchronized void setPosX(int x) {
         this.posX = x;
     }
 
-    public void setPosY(int y) {
+    public synchronized void setPosY(int y) {
         this.posY = y;
     }
 
