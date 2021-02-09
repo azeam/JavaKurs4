@@ -28,7 +28,7 @@ public class Person implements Npc {
     }
 
     private void setStartPosition() {
-        // TODO: does not seem to work, check why - should be fixed, confirm
+        // don't place npc in wall or on item
         do {
             System.out.println(this.npcName + " set position to " + this.posX + this.posY);
             this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_WIDTH, Constants.ALL_ROOMS_WIDTH - Constants.NPC_WIDTH + Constants.MARGIN);

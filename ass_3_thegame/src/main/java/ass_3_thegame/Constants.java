@@ -1,9 +1,10 @@
 package ass_3_thegame;
 
 public class Constants {
-    protected static boolean GL_PAUSED = false;
-    public static boolean GL_MASTER = true;
-	protected static Npc GL_NPC_HIT;
+    protected static boolean GL_PAUSED = false; // global paused flag
+	protected static Npc GL_NPC_HIT; // global npc hit flag, TODO: could be made in a better way
+    
+    // values that could be placed in a settings menu (most of them)
     public final static int 
                             WINDOW_HEIGHT = 800,
                             ROOM_WIDTH = 300,
@@ -11,7 +12,7 @@ public class Constants {
                             NPC_WIDTH = 24,  // set to img values for hitbox
                             NPC_HEIGHT = 30, // set to img values for hitbox
                             OBJ_SIZE = 25,
-                            WALL_SIZE = 150,
+                            WALL_SIZE = 100,
                             WALL_WIDTH = 1,
                             INV_SIZE_NPC = 1,
                             INV_SIZE_NPC_MIN = 0,

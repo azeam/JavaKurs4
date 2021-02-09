@@ -1,6 +1,7 @@
 package ass_3_thegame;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javafx.animation.AnimationTimer;
@@ -21,144 +22,136 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 
-/*Extremt enkelt Gui för att kunna komma igång.
-Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kursmoment - så fastna inte här!
- */
+public class Gui {
+    private GraphicsContext background;
+    private Image heroImage;
+    private Node hero;
+    private boolean running, goNorth, goSouth, goEast, goWest;
+    private Pane root = new Pane();
+    private Player player;
+    private ArrayList<Room> roomGroup;
+    private Group walls = new Group();
 
-    public class Gui {
-        private GraphicsContext background;
-        private Image heroImage;
-        private Node  hero;
-        private boolean running, goNorth, goSouth, goEast, goWest;
-        private Pane root = new Pane();
-        private Player player;
-        private ArrayList<Room> roomGroup;
-        static Group walls = new Group();
+    private Rectangle top, bottom, left, right, inner, nodeWall, rectPerson;
+    private List<ImageView> personsList = new ArrayList<ImageView>();
+    private List<ImageView> itemsList = new ArrayList<ImageView>();
+    private List<GameObject> itemsObjList = new ArrayList<GameObject>();
 
-        private Rectangle top, bottom, left, right, inner, nodeWall, rectPerson;
-        private List<ImageView> personsList = new ArrayList<ImageView>();
-        private List<ImageView> itemsList = new ArrayList<ImageView>();
-        private List<GameObject> itemsObjList = new ArrayList<GameObject>();
-    
-        private Shape intersect;
-        private static final Image monsterImage = new Image(Constants.MONSTER_IMG_LOC);
-        private static final Image monsterItemImage = new Image(Constants.MONSTER_IMG_ITEM_LOC);
-        private static final Image keyImage = new Image(Constants.KEY_IMAGE_LOC);
-        private static final Image keyMasterImage = new Image(Constants.KEY_MASTER_IMAGE_LOC);
-        private static final Image keyGroundImage = new Image(Constants.KEY_GROUND_IMAGE_LOC);
-        private static final Image chestImage = new Image(Constants.CHEST_IMAGE_LOC);
-        private static final Image chestOpenImage = new Image(Constants.CHEST_OPEN_IMAGE_LOC);
-        private static final Image doorImage = new Image(Constants.DOOR_IMAGE_LOC);
+    private Shape intersect;
+    private static final Image monsterImage = new Image(Constants.MONSTER_IMG_LOC);
+    private static final Image monsterItemImage = new Image(Constants.MONSTER_IMG_ITEM_LOC);
+    private static final Image keyImage = new Image(Constants.KEY_IMAGE_LOC);
+    private static final Image keyMasterImage = new Image(Constants.KEY_MASTER_IMAGE_LOC);
+    private static final Image keyGroundImage = new Image(Constants.KEY_GROUND_IMAGE_LOC);
+    private static final Image chestImage = new Image(Constants.CHEST_IMAGE_LOC);
+    private static final Image chestOpenImage = new Image(Constants.CHEST_OPEN_IMAGE_LOC);
+    private static final Image doorImage = new Image(Constants.DOOR_IMAGE_LOC);
 
-        public Gui(Stage stage, Player player) {
-            this.player = player;
-            Canvas canvas = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
-            Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
-            this.background = canvasBG.getGraphicsContext2D();
+    // set up base GUI items
+    public Gui(Stage stage, Player player) {
+        this.player = player;
+        Canvas canvas = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+        Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+        this.background = canvasBG.getGraphicsContext2D();
 
-            heroImage = new Image(Constants.HERO_IMAGE_LOC);
-            hero = new ImageView(heroImage);
+        heroImage = new Image(Constants.HERO_IMAGE_LOC);
+        hero = new ImageView(heroImage);
 
-            Group dungeon = new Group(hero);
+        Group dungeon = new Group(hero);
 
-            root.setFocusTraversable(true);
-            root.getChildren().add(canvasBG);
-            root.getChildren().add(canvas);
-            root.getChildren().add(dungeon);
-            Scene scene = new Scene(root, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT, Color.BLACK);
+        root.setFocusTraversable(true);
+        root.getChildren().add(canvasBG);
+        root.getChildren().add(canvas);
+        root.getChildren().add(dungeon);
+        Scene scene = new Scene(root, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT, Color.BLACK);
 
-            dungeon.requestFocus();
-            setHeroMovement(dungeon);
-            moveHeroTo(Constants.MARGIN + Constants.ROOM_WIDTH / 2, Constants.MARGIN + Constants.ROOM_HEIGHT / 2);
+        dungeon.requestFocus();
+        setHeroMovement(dungeon);
+        moveHeroTo(Constants.MARGIN + Constants.ROOM_WIDTH / 2, Constants.MARGIN + Constants.ROOM_HEIGHT / 2);
 
-            stage.setResizable(false);
-            stage.setTitle("The Game");
-            stage.setOnCloseRequest(e -> System.exit(0));
-            stage.setScene(scene);
-            stage.show();
-        }
+        stage.setResizable(false);
+        stage.setTitle("The Game");
+        stage.setOnCloseRequest(e -> System.exit(0));
+        stage.setScene(scene);
+        stage.show();
+    }
 
-		public void setUpWalls() {
-            for (int i = 1; i < roomGroup.size(); i++) {
-                if (roomGroup.get(i).getRoomId() %2 == 0) {
-                    paintWalls(roomGroup.get(i).getRoomId(), "up");
-                }
-                else {
-                    paintWalls(roomGroup.get(i).getRoomId(), "down");
-                }
-            }
-		}
-
-		public void setUpInventory(Inventory inventory, Object owner) {
-            if (inventory == null) {
-                hideInventory(false);
-                return;                 
-            }
-            int x = owner instanceof Player ? Constants.WINDOW_WIDTH / 2 + Constants.MARGIN : Constants.MARGIN;
-            int y = Constants.MARGIN * 3 + Constants.ROOM_HEIGHT;
-            
-            for (int i = 0; i < inventory.getInventory().length; i++) {       
-                if (inventory.getInventory()[i] != null) {
-                    showInventory(x + (i * (Constants.OBJ_SIZE + 15)), y, inventory.getInventory()[i], inventory.getOwnerName(), owner);                    
-                }
-                else {
-                    showInventory(x + (i * (Constants.OBJ_SIZE + 15)), y, null, inventory.getOwnerName(), owner);
-                }
-            }
-		}
-
-		public void setRoomGroup(ArrayList<Room> roomGroup) {
-            this.roomGroup = roomGroup;
-        }
-        
-        public void paint(ArrayList<Npc> personGroup) {
-            for (int i = 0; i < personGroup.size(); i++) {
-                Npc person = personGroup.get(i);
-                if (person.isCarrying()) {
-                    personsList.get(i).setImage(monsterItemImage);
-                } else {
-                    personsList.get(i).setImage(monsterImage);
-                }
-                personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
-                personsList.get(i).setTranslateY(personGroup.get(i).getPosY());
+    public void setUpWalls() {
+        for (int i = 1; i < roomGroup.size(); i++) {
+            if (roomGroup.get(i).getRoomId() % 2 == 0) {
+                paintWalls(roomGroup.get(i).getRoomId(), "up");
+            } else {
+                paintWalls(roomGroup.get(i).getRoomId(), "down");
             }
         }
+    }
 
-        public void hideInventory(boolean both) {
+    public void setUpInventory(Inventory inventory, Object owner) {
+        if (inventory == null) {
+            hideInventory(false);
+            return;
+        }
+        // right side for player
+        int x = owner instanceof Player ? Constants.WINDOW_WIDTH / 2 + Constants.MARGIN : Constants.MARGIN;
+        int y = Constants.MARGIN * 3 + Constants.ROOM_HEIGHT;
+
+        for (int i = 0; i < inventory.getInventory().length; i++) {
+            if (inventory.getInventory()[i] != null) {
+                showInventory(x + (i * (Constants.OBJ_SIZE + 15)), y, inventory.getInventory()[i],
+                        inventory.getOwnerName(), owner);
+            } else {
+                showInventory(x + (i * (Constants.OBJ_SIZE + 15)), y, null, inventory.getOwnerName(), owner);
+            }
+        }
+    }
+
+    public void setRoomGroup(ArrayList<Room> roomGroup) {
+        this.roomGroup = roomGroup;
+    }
+
+    // update npc position in GUI
+    public void paint(ArrayList<Npc> personGroup) {
+        for (int i = 0; i < personGroup.size(); i++) {
+            Npc person = personGroup.get(i);
+            if (person.isCarrying()) {
+                personsList.get(i).setImage(monsterItemImage);
+            } else {
+                personsList.get(i).setImage(monsterImage);
+            }
+            personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
+            personsList.get(i).setTranslateY(personGroup.get(i).getPosY());
+        }
+    }
+
+    // clear painted inventory
+    public void hideInventory(boolean both) {
             if (both) {
                 background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH - Constants.MARGIN,
                 Constants.ROOM_HEIGHT);
                 Platform.runLater(() -> {
-                    root.getChildren().remove(root.lookup(".npcItem"));
-                    root.getChildren().remove(root.lookup(".exchangeImage"));
-                    root.getChildren().remove(root.lookup(".containerItem"));
-                    root.getChildren().remove(root.lookup(".playerItem"));
+                    root.getChildren().remove(".playerItem");
                 });
             }
             else {
                 background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
                 Constants.ROOM_HEIGHT);
-                Platform.runLater(() -> {
-                    root.getChildren().remove(root.lookup(".containerItem"));
-                    root.getChildren().remove(root.lookup(".npcItem"));
-                    root.getChildren().remove(root.lookup(".exchangeImage"));
-                });
             }
+            Platform.runLater(() -> {
+                root.getChildren().remove(root.lookup(".containerItem"));
+                root.getChildren().remove(root.lookup(".npcItem"));
+                root.getChildren().remove(root.lookup(".exchangeImage"));
+            });
         }
 
         public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
-            
             if (owner == Constants.PLAYER_NAME) {
                 background.fillText("Inventory of " + owner, Constants.WINDOW_WIDTH / 2 + Constants.MARGIN,
                         Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
             } 
             else if (ownerType instanceof Container) {
-                Container chest = (Container) ownerType;
-                
+                Container chest = (Container) ownerType;       
                 if (!chest.isOpen()) {
-
                     background.fillText("Unable to unlock " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);  
-                      
                     return;
                 }
                 else {
@@ -173,8 +166,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             background.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
 
             if (gameObject != null) {
-                String type = gameObject.getType();
-                if (type == "Key") {
+                if (gameObject instanceof Key) {
                     Key key = (Key) gameObject;
                     ImageView itemImg = new ImageView(keyImage);
                     if (key.isMaster()) {
@@ -182,7 +174,8 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     }
                     itemImg.setX(x);
                     itemImg.setY(y);
-                    background.fillText(gameObject.toString(), x, y);
+                    background.fillText(gameObject.toString(), x, y); // TODO: WTF, changing this does nothing and text remains????
+                    
                     itemImg.getStyleClass().clear();
                     if (owner == Constants.PLAYER_NAME) {
                         itemImg.getStyleClass().add("playerItem");
@@ -200,11 +193,12 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             }
         }
 
+        // if possible to trade, show trade image when selecting player item
         private EventHandler<MouseEvent> inventoryItemClicked(ImageView itemImg, Object ownerType, GameObject gameObject) {
             return new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {                    
-                    itemImg.setOpacity(0.5);
+                    itemImg.setOpacity(0.5); 
                     player.setSelectedPlayerObject(gameObject);
                     System.out.println(itemImg.getStyleClass());
                     if (Constants.GL_NPC_HIT != null) {
@@ -219,6 +213,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     }
                 }
 
+                // get selected item and trade it with npc
                 private EventHandler<? super MouseEvent> exchangeItemHandler(ImageView itemImg) {
                     return new EventHandler<MouseEvent>() {
                         @Override
@@ -236,13 +231,13 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                             setUpInventory(player.getInventory(), player);
                             setUpInventory(person.getInventory(), person);
                             person.setDirection(Direction.getOpposite(person.getDirection()));
-                        
                         }
                     };
                 }
             };
         }
 
+        // paint background
         public void paintWalls(int order, String doorLocation) {
             top = new Rectangle(Constants.ALL_ROOMS_WIDTH, Constants.WALL_WIDTH);
             top.setX(Constants.MARGIN);
@@ -353,7 +348,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     else if (!person.isCarrying() && object.isPickable()) {
                         if (room.getInventory().exchangeItem(object, person.getInventory(),
                                 "npcPickup", nextX, nextY)) {  
-                                    removeObj(object, item); 
+                                    removeObj(object, item); // remove drawn but picked up item from GUI
                                     return true;       
                                 }
                     }                  
@@ -424,10 +419,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 @Override
                 public void handle(KeyEvent event) {
                     switch (event.getCode()) {
-                        case W:    goNorth = true; break;
-                        case S:  goSouth = true; break;
-                        case A:  goWest  = true; break;
-                        case D: goEast  = true; break;
+                        case W:     goNorth = true; break;
+                        case S:     goSouth = true; break;
+                        case A:     goWest  = true; break;
+                        case D:     goEast  = true; break;
                         case SHIFT: running = true; break;
                         default: break;
                     }
@@ -438,10 +433,10 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                 @Override
                 public void handle(KeyEvent event) {
                     switch (event.getCode()) {
-                        case W:    goNorth = false; break;
-                        case S:  goSouth = false; break;
-                        case A:  goWest  = false; break;
-                        case D: goEast  = false; break;
+                        case W:     goNorth = false; break;
+                        case S:     goSouth = false; break;
+                        case A:     goWest  = false; break;
+                        case D:     goEast  = false; break;
                         case SHIFT: running = false; break;
                         default: break;
                     }
@@ -488,7 +483,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             Node hitNode = (Node) hitItem[1];
             player.setCurRoom();
             player.setSelectedPlayerObject(null);
-
+            
             if (!wallCollision(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT)
             && hitObject == null) {
                     player.setPosX(newX);
@@ -503,6 +498,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
             }
         }
 
+        // player collision with chest/key/door
         private void handleHitObject(GameObject hitObject, Node hitNode, int newX, int newY) {
             Container chest = null;
 
@@ -520,6 +516,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                     Constants.GL_PAUSED = true;
                     boolean chestUnlocked = false;
                     GameObject objToRemove = null;
+                    // try to unlock with all keys in inventory
                     for (GameObject playersObject: player.getInventory().getInventory()) {
                         if (playersObject instanceof Key) {
                             Key key = (Key) playersObject;
@@ -531,6 +528,7 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                         }
                     }
 
+                    // if player unlocks chest, take the key
                     if (chestUnlocked) {
                         chest.setOpen(true);
                         addItem(chest); // add open chest img
@@ -541,28 +539,31 @@ Snygga gärna till/gör ett eget. Men tänk på att gör GUI:s INTE är ett kurs
                             GameObject keyToTake = chest.getInventory().getInventory()[0];
                             player.getInventory().addToInventory(player.getInventory(), keyToTake); // add master key to player inv
                             chest.getInventory().remove(keyToTake); // remove from chest inv
-                            this.background.fillText("CARRYING MASTER KEY", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 100);
+                            this.background.fillText("MASTER KEY FOUND", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 200);
                         }     
+                        
                     }
-                       
+                    
                 }
                  // refresh inventory
                  // TODO: chest needs to be set higher up or removed key will remain in place when opening 
                  // an empty chest for some reason, but then "can't open" won't show, fix this
                 hideInventory(true);
                 setUpInventory(chest.getInventory(), chest); 
-                setUpInventory(player.getInventory(), player); 
+                setUpInventory(player.getInventory(), player);                 
             }
             else if (hitNode.getUserData() != null && hitNode.getUserData() == "door") {
                 for (GameObject playerObject : player.getInventory().getInventory()) {
                     if (playerObject instanceof Key) {
                         Key key = (Key) playerObject;
                         if (key.isMaster()) {
-                            System.out.println("YOU BEAT GAME!");
+                            this.background.fillText("YOU BEAT GAME!", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 100);
+
                         }
                     }
                 }
             }
+            
         }
 
 	

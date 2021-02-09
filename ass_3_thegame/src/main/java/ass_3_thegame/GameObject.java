@@ -2,11 +2,8 @@ package ass_3_thegame;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-// TODO: must be abstract/interface
 public abstract class GameObject {
-    // Ska hantera alla "icke-
-    // levandeöbjekt i spelet (möbler, nycklar etc). GameObject ska innehålla
-    // en boolean som avgör om objektet går att ta med sig eller är fastmonterat"i rummet.
+   
     protected boolean pickable;
     protected String type;
     private int posX, posY;
@@ -57,6 +54,12 @@ public abstract class GameObject {
 
     @Override 
     public String toString() {
+        if (this.type == "Key") {
+            Key key = (Key) this;
+            if (key.isMaster()) {
+                return "Master key";
+            }
+        }
         return this.type + this.id;
     }
 

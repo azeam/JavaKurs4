@@ -33,11 +33,11 @@ public enum Direction {
 
     public static Direction getOpposite(Direction curDir) {
         Direction newDir = switch (curDir) {
-            case N -> values()[getRandomOf(5, 6, 7)];
+            case N  -> values()[getRandomOf(5, 6, 7)];
             case NW -> values()[getRandomOf(7, 6, 4)];
             case NE -> values()[getRandomOf(5, 3, 7)];
-            case W -> values()[getRandomOf(2, 4, 6)];
-            case E -> values()[getRandomOf(1, 3, 5)];
+            case W  -> values()[getRandomOf(2, 4, 6)];
+            case E  -> values()[getRandomOf(1, 3, 5)];
             case SW -> values()[getRandomOf(0, 2, 4)];
             case SE -> values()[getRandomOf(0, 2, 3)];
             default -> values()[getRandomOf(0, 1, 2)];

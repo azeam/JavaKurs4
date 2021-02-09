@@ -1,7 +1,6 @@
 package ass_3_thegame;
 
 public class Room {
-    // Ett Room ska ha ett unikt namn, ett Inventory och sen show-Metod() som beskriver det för spelaren.
     private String roomName;
     private Inventory inventory;
     private int roomId;

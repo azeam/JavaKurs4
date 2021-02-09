@@ -10,16 +10,10 @@ import ass_3_thegame.GameObject;
 import ass_3_thegame.Key;
 import ass_3_thegame.Room;
 
-
-// TODO: randomize only one master key somewhere, set global int?
-// TODO: only make non pickable in rooms
-
-// one master key in a chest -> opens door
-// other chests are empty
-// for each chest make a key
-
 public class GameObjectFactory {
     public GameObject createGameObject(boolean onlyPickable, Room room, boolean isMaster) {
+
+        // random id, half of max total possible items, should be a good number to make it completable sometimes and sometimes not
         int id = ThreadLocalRandom.current().nextInt(0, (Constants.NUM_ROOMS * Constants.INV_SIZE_ROOM / 2) + 1);
         
         if (onlyPickable) {

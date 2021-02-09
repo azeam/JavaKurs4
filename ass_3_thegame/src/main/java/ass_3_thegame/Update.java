@@ -38,6 +38,7 @@ public class Update implements Runnable {
     }
 
     private void placeMasterKey(ArrayList<Room> roomGroup2) {
+        // make list of all chests
         List<GameObject[]> roomsInventories = new ArrayList<GameObject[]>();
         for (Room room: roomGroup) {
             roomsInventories.add(room.getInventory().getInventory());
@@ -50,6 +51,7 @@ public class Update implements Runnable {
                 }
             }
         }
+        // make master key and place it in a random chest, the other chests are empty
         int masterPos = ThreadLocalRandom.current().nextInt(0, containers.size());
         GameObjectFactory gameObjectFactory = new GameObjectFactory();
         GameObject masterKey = gameObjectFactory.createGameObject(true, null, true);
@@ -61,6 +63,7 @@ public class Update implements Runnable {
         updateGui(personGroup, roomGroup);
     }
 
+    // get npc position and pass it to gui to draw, also checks for collisions and handles item pickup/drop
     private void updateGui(ArrayList<Npc> personGroup, ArrayList<Room> roomGroup) {
         // will safely run on java fx thread
         AnimationTimer timer = new AnimationTimer() {
@@ -90,7 +93,7 @@ public class Update implements Runnable {
                         else if (gui.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
                             person.setDirection(Direction.getOpposite(person.getDirection()));
                         }                     
-                        else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) {
+                        else if (ThreadLocalRandom.current().nextInt(1, 1000) == 1 && person.isCarrying()) { // 1/1000 chance to drop item (seems ok number for default 60 FPS)
                             Direction behind = (person.getDirection());
                             
                             int behindX = person.getPosX() - behind.getX() * Constants.OBJ_SIZE;

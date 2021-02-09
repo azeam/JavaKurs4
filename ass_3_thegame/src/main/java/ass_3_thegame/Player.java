@@ -1,9 +1,6 @@
 package ass_3_thegame;
 
 public class Player {
-    // Håller ordning på var spelaren befinner sig (alltså vilket rum
-    // som ska beskrivas), samt spelarens Inventory.
-
     String name = Constants.PLAYER_NAME;
     private Inventory inventory;
     private int posX, posY, curRoom;
