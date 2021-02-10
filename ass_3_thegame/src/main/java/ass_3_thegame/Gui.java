@@ -201,6 +201,7 @@ public class Gui {
                 if (owner == Constants.PLAYER_NAME) {
                     itemImg.setOnMouseClicked(inventoryItemClicked(itemImg, ownerType, gameObject));
                     itemImg.getStyleClass().add("rightItem");
+                    itemImg.setStyle("-fx-cursor: hand;");
                 } 
                 else {
                     itemImg.getStyleClass().add("leftItem");
@@ -219,29 +220,28 @@ public class Gui {
             @Override
             public void handle(MouseEvent event) {
                 // disable trading after finding the door key (and completing the game in case npc is on top of player)     
-                if (!gameBeat && !doorKeyFound) {
+                if (!gameBeat && !doorKeyFound && Constants.GL_NPC_HIT != null) {
                     for (int i = 0; i < itemsList.size(); i++) {
                         itemsList.get(i).setOpacity(1);                        
                     }               
                     itemImg.setOpacity(0.3);
                 
                     player.setSelectedPlayerObject(gameObject);
-                    if (Constants.GL_NPC_HIT != null) {
-                        Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
-                        ImageView exImgView = new ImageView(exImage);
-                        exImgView.setX(Constants.WINDOW_WIDTH / 2 - 20);
-                        exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT - 6);
+                    Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
+                    ImageView exImgView = new ImageView(exImage);
+                    exImgView.setX(Constants.WINDOW_WIDTH / 2 - 20);
+                    exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT - 6);
+                    exImgView.setOpacity(0.3);
+                    exImgView.setStyle("-fx-cursor: hand;");
+                    exImgView.setOnMouseEntered(mouseEvent -> {
+                        exImgView.setOpacity(1);
+                    });
+                    exImgView.setOnMouseExited(mouseEvent -> {
                         exImgView.setOpacity(0.3);
-                        exImgView.setOnMouseEntered(mouseEvent -> {
-                            exImgView.setOpacity(1);
-                        });
-                        exImgView.setOnMouseExited(mouseEvent -> {
-                            exImgView.setOpacity(0.3);
-                        });
-                        exImgView.getStyleClass().add("leftItem");
-                        exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
-                        showObj(exImgView);
-                    }
+                    });
+                    exImgView.getStyleClass().add("leftItem");
+                    exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
+                    showObj(exImgView);
                 }
             }
 
