@@ -6,15 +6,20 @@ import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -29,10 +34,15 @@ public class Gui {
     private Player player;
     private ArrayList<Room> roomGroup;
     private Group walls = new Group();
+    private boolean gameBeat = false;
+    private boolean doorKeyFound = false;
+
+    private Label playerLabel, otherInvLabel, messageLabel;
 
     private List<ImageView> personsList = new ArrayList<ImageView>();
     private List<ImageView> itemsList = new ArrayList<ImageView>();
     private List<GameObject> itemsObjList = new ArrayList<GameObject>();
+    private AnimationTimer timer;
 
     private static final Image heroImage = new Image(Constants.HERO_IMAGE_LOC);
     private static final Image monsterImage = new Image(Constants.MONSTER_IMG_LOC);
@@ -57,6 +67,7 @@ public class Gui {
         this.root.setFocusTraversable(true);
         this.root.getChildren().add(canvasBG);
         this.root.getChildren().add(dungeon);
+        this.root.setBackground(Background.EMPTY); // needed for labels to not remove gc bg color
         Scene scene = new Scene(root, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT, Color.BLACK);
 
         dungeon.requestFocus();
@@ -78,7 +89,29 @@ public class Gui {
                 paintInnerWalls(this.roomGroup.get(i).getRoomId(), "down");
             }
         }
+        this.playerLabel = new Label("Inventory of " + Constants.PLAYER_NAME);
+        this.playerLabel.setTranslateX(Constants.WINDOW_WIDTH / 2 + Constants.MARGIN);
+        this.playerLabel.setTranslateY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
+        this.playerLabel.setId("playerLabel");
+        this.playerLabel.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(5.0), new Insets(-5.0))));
+        this.playerLabel.setTextFill(Color.WHITE);
+        this.otherInvLabel = new Label();
+        this.otherInvLabel.setTranslateX(Constants.MARGIN);
+        this.otherInvLabel.setTranslateY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
+        this.otherInvLabel.setId("otherInvLabel");
+        this.otherInvLabel.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(5.0), new Insets(-5.0))));
+        this.otherInvLabel.setTextFill(Color.WHITE);
+        this.messageLabel = new Label();
+        this.messageLabel.setTranslateX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5); // default capital font seems to be about 5 px wide/char
+        this.messageLabel.setTranslateY(Constants.MARGIN / 2 - 8);
+        this.messageLabel.setId("messageLabel");
+        this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
+        this.messageLabel.setTextFill(Color.WHITE);
+        showObj(otherInvLabel);
+        showObj(playerLabel);
+        showObj(messageLabel);
         paintWalls();
+        
     }
 
     public void setUpInventory(Inventory inventory, Object owner) {
@@ -132,26 +165,20 @@ public class Gui {
             this.background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
             Constants.ROOM_HEIGHT);
         }
+        this.otherInvLabel.setText("");
         this.root.getChildren().remove(this.root.lookup(".leftItem"));
     }
 
     public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
-        if (owner == Constants.PLAYER_NAME) {
-            this.background.fillText("Inventory of " + owner, Constants.WINDOW_WIDTH / 2 + Constants.MARGIN,
-                    Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
-        } 
-        else if (ownerType instanceof Container) {
+        if (owner != null) {
+            this.otherInvLabel.setText("Inventory of " + owner);
+        }
+        if (ownerType instanceof Container) {
             Container chest = (Container) ownerType;       
             if (!chest.isOpen()) {
-                this.background.fillText("Unable to unlock " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);  
+                this.otherInvLabel.setText("Unable to unlock " + owner);
                 return;
             }
-            else {
-                this.background.fillText("Inventory of " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);    
-            }
-        }
-        else if (owner != null) {
-            this.background.fillText("Inventory of " + owner, Constants.MARGIN, Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
         }
 
         this.background.setStroke(Color.WHITE);
@@ -166,7 +193,7 @@ public class Gui {
                 }
                 itemImg.setX(x);
                 itemImg.setY(y);
-                this.background.fillText(gameObject.toString(), x, y);
+                this.background.fillText(gameObject.toString(), x - 2, y - 5);
                 
                 itemImg.getStyleClass().clear();
                 itemsList.add(itemImg);
@@ -190,22 +217,31 @@ public class Gui {
     private EventHandler<MouseEvent> inventoryItemClicked(ImageView itemImg, Object ownerType, GameObject gameObject) {
         return new EventHandler<MouseEvent>() {
             @Override
-            public void handle(MouseEvent event) {     
+            public void handle(MouseEvent event) {
+                // disable trading after finding the door key (and completing the game in case npc is on top of player)     
+                if (!gameBeat && !doorKeyFound) {
+                    for (int i = 0; i < itemsList.size(); i++) {
+                        itemsList.get(i).setOpacity(1);                        
+                    }               
+                    itemImg.setOpacity(0.3);
                 
-                for (int i = 0; i < itemsList.size(); i++) {
-                    itemsList.get(i).setOpacity(1);                        
-                }               
-                itemImg.setOpacity(0.3);
-            
-                player.setSelectedPlayerObject(gameObject);
-                if (Constants.GL_NPC_HIT != null) {
-                    Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
-                    ImageView exImgView = new ImageView(exImage);
-                    exImgView.setX(Constants.WINDOW_WIDTH / 2);
-                    exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT);
-                    exImgView.getStyleClass().add("leftItem");
-                    exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
-                    showObj(exImgView);
+                    player.setSelectedPlayerObject(gameObject);
+                    if (Constants.GL_NPC_HIT != null) {
+                        Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
+                        ImageView exImgView = new ImageView(exImage);
+                        exImgView.setX(Constants.WINDOW_WIDTH / 2 - 20);
+                        exImgView.setY(Constants.MARGIN * 3 + Constants.ROOM_HEIGHT - 6);
+                        exImgView.setOpacity(0.3);
+                        exImgView.setOnMouseEntered(mouseEvent -> {
+                            exImgView.setOpacity(1);
+                        });
+                        exImgView.setOnMouseExited(mouseEvent -> {
+                            exImgView.setOpacity(0.3);
+                        });
+                        exImgView.getStyleClass().add("leftItem");
+                        exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
+                        showObj(exImgView);
+                    }
                 }
             }
 
@@ -476,8 +512,9 @@ public class Gui {
 
         double x = cx + this.hero.getLayoutX() + dx;
         double y = cy + this.hero.getLayoutY() + dy;
-
-        moveHeroTo(x, y);
+        if (!gameBeat) {
+            moveHeroTo(x, y);
+        }
     }
 
     private void moveHeroTo(double x, double y) {
@@ -529,8 +566,9 @@ public class Gui {
                 if (playerObject instanceof Key) {
                     Key key = (Key) playerObject;
                     if (key.isMaster()) {
-                        this.background.fillText("YOU BEAT GAME!", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 100);
-
+                        this.messageLabel.setText("YOU BEAT GAME!");
+                        this.timer.stop();
+                        this.gameBeat = true;
                     }
                 }
             }
@@ -554,7 +592,7 @@ public class Gui {
         }
 
         // if player unlocks chest, remove the key from game
-        if (chestUnlocked && objToRemove instanceof Key) {
+        if (chestUnlocked) {
             chest.setOpen(true);
             ImageView lockedChest = (ImageView) hitNode;
             lockedChest.setImage(chestOpenImage);
@@ -563,7 +601,8 @@ public class Gui {
                 GameObject keyToTake = chest.getInventory().getInventory()[0];
                 player.getInventory().addToInventory(player.getInventory(), keyToTake); // add master key to player inv
                 chest.getInventory().remove(keyToTake); // remove from chest inv
-                this.background.fillText("MASTER KEY FOUND", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 200);
+                this.messageLabel.setText("DOOR KEY FOUND");
+                this.doorKeyFound = true;
             }      
             // refresh inventories
             hideInventory(true);
@@ -572,6 +611,10 @@ public class Gui {
         hideInventory(false);
         setUpInventory(chest.getInventory(), chest); 
     }
+
+	public void setTimer(AnimationTimer timer) {
+        this.timer = timer;
+	}
 
 	
 }

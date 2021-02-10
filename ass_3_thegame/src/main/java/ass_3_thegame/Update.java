@@ -56,10 +56,14 @@ public class Update implements Runnable {
             }
         }
         // make master key and place it in a random chest, the other chests are empty
-        int masterPos = ThreadLocalRandom.current().nextInt(0, containers.size());
-        GameObjectFactory gameObjectFactory = new GameObjectFactory();
-        GameObject masterKey = gameObjectFactory.createGameObject(true, null, true);
-        containers.get(masterPos).getInventory().addToInventory(containers.get(masterPos).getInventory(), masterKey);
+        // TODO: fix, at least one chest should be made or restart game
+        if (containers.size() > 0) {
+            int masterPos = ThreadLocalRandom.current().nextInt(0, containers.size());
+            GameObjectFactory gameObjectFactory = new GameObjectFactory();
+            GameObject masterKey = gameObjectFactory.createGameObject(true, null, true);
+            containers.get(masterPos).getInventory().addToInventory(containers.get(masterPos).getInventory(), masterKey);
+        }
+
     }
 
     @Override
@@ -117,6 +121,7 @@ public class Update implements Runnable {
             }
         };
         timer.start();       
+        gui.setTimer(timer);
     }
 
     private synchronized void changePos(Npc person, int newX, int newY) {

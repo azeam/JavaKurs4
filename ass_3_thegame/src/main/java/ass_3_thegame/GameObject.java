@@ -57,7 +57,7 @@ public abstract class GameObject {
         if (this.type == "Key") {
             Key key = (Key) this;
             if (key.isMaster()) {
-                return "Master key";
+                return "Door";
             }
         }
         return this.type + this.id;

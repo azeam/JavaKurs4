@@ -14,7 +14,7 @@ public class Constants {
                             OBJ_SIZE = 25,
                             WALL_SIZE = 100,
                             WALL_WIDTH = 1,
-                            INV_SIZE_NPC = 1,
+                            INV_SIZE_NPC = 1, // should not be set higher, only set up for 1
                             INV_SIZE_NPC_MIN = 0,
                             INV_SIZE_ROOM = 5,
                             INV_SIZE_ROOM_MIN = 0,
@@ -26,7 +26,7 @@ public class Constants {
                             ALL_ROOMS_WIDTH = NUM_ROOMS * ROOM_WIDTH,
 	                        PLAYER_WIDTH = 40, // set to img values for hitbox
                             PLAYER_HEIGHT = 38,  // set to img values for hitbox
-                            DOOR_HEIGHT = 50; 
+                            DOOR_HEIGHT = 50; // more looks better but placing objects needs to be fixed or there is higher chance of getting stuck in rooms
 
     public static final String  
                             PLAYER_NAME = "Azeam",
