@@ -40,7 +40,7 @@ public class Update implements Runnable {
                 }
             }
         }
-        
+
         // make master key and place it in a random chest, the other chests are empty
         if (containers.size() > 0) {
             int masterPos = ThreadLocalRandom.current().nextInt(0, containers.size());
@@ -93,7 +93,13 @@ public class Update implements Runnable {
                         if (gui.npcItemCollision(person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {}
                         else if (gui.playerNpcCollision(person, newX, newY)) {
                             gui.setUpInventory(person.getInventory(), person);
-                            if (person.getInventory().getInventory()[0] != null) {
+                            if (person.isCarrying()) {
+                                if (player.isCarrying()) {
+                                    gui.showMessage("Click on the key to trade with " + person.getName());
+                                }
+                                else {
+                                    gui.showMessage("Find another key to trade with " + person.getName());
+                                }
                                 Constants.GL_NPC_HIT = person;
                             }
                             Constants.GL_PAUSED = true;

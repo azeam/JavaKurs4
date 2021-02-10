@@ -44,10 +44,10 @@ public class Inventory {
         ArrayList<GameObject> gameObjectGroup = null;
 
         switch (owner) {
-            case "player": gameObjectGroup = gameObjectFactory.createGroup(0, true, null); break;
-            case "room": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false, room); break;
-            case "npc": gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true, null); break;
-            case "container": gameObjectGroup = gameObjectFactory.createGroup(0, true, null); break;
+            case "player":      gameObjectGroup = gameObjectFactory.createGroup(0, true, null); break;
+            case "room":        gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, false, room); break;
+            case "npc":         gameObjectGroup = gameObjectFactory.createGroup(randomNumItems, true, null); break;
+            case "container":   gameObjectGroup = gameObjectFactory.createGroup(0, true, null); break;
             default: break;
         }
         for (GameObject obj: gameObjectGroup) {

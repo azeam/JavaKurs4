@@ -53,4 +53,8 @@ public class Player {
         return this.selectedObject;
     }
 
+	public boolean isCarrying() {
+		return (this.inventory.getInventory()[0] != null);
+	}
+
 }

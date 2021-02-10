@@ -28,7 +28,7 @@ import javafx.stage.Stage;
 public class Gui {
     private GraphicsContext background;
     private Node hero;
-    private boolean running, goNorth, goSouth, goEast, goWest;
+    private boolean goNorth, goSouth, goEast, goWest;
     private Pane root = new Pane();
     private Player player;
     private ArrayList<Room> roomGroup;
@@ -100,10 +100,10 @@ public class Gui {
         this.otherInvLabel.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(5.0), new Insets(-5.0))));
         this.otherInvLabel.setTextFill(Color.WHITE);
         this.messageLabel = new Label();
-        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5); // default capital font seems to be about 5 px wide/char
+        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default capital font seems to be about 5 px wide/char
         this.messageLabel.setLayoutY(Constants.MARGIN / 2 - 8);
         this.messageLabel.setId("messageLabel");
-        this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
+        this.messageLabel.setBackground(new Background(new BackgroundFill(Color.PURPLE, new CornerRadii(5.0), new Insets(-5.0))));
         this.messageLabel.setTextFill(Color.WHITE);
         this.root.getChildren().addAll(otherInvLabel, playerLabel, messageLabel);
         paintWalls();
@@ -166,17 +166,18 @@ public class Gui {
     }
 
     public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
-        if (owner != null) {
-            this.otherInvLabel.setText("Inventory of " + owner);
-        }
+        
         if (ownerType instanceof Container) {
             Container chest = (Container) ownerType;       
             if (!chest.isOpen()) {
-                this.otherInvLabel.setText("Unable to unlock " + owner);
+                int id = chest.getId();
+                showMessage("Unable to unlock. The chest is engraved with the number " + id);                
                 return;
             }
         }
-
+        if (owner != null) {
+            this.otherInvLabel.setText("Inventory of " + owner);
+        }
         this.background.setStroke(Color.WHITE);
         this.background.strokeRect(x, y, Constants.OBJ_SIZE, Constants.OBJ_SIZE);
 
@@ -236,6 +237,9 @@ public class Gui {
                     exImgView.getStyleClass().add("leftItem");
                     exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
                     root.getChildren().add(exImgView);
+                }
+                else {
+                    messageLabel.setText("DOOR KEY FOUND, HEAD TO THE EXIT!");
                 }
             }
 
@@ -360,7 +364,7 @@ public class Gui {
         rectPerson.setY(newY);
         Shape intersect = Shape.intersect(rectPlayer, rectPerson);
         if (intersect.getBoundsInParent().getWidth() > 0) {
-                return true;
+            return true;
         }
         return false;
     }
@@ -452,7 +456,6 @@ public class Gui {
                     case S:     goSouth = true; break;
                     case A:     goWest  = true; break;
                     case D:     goEast  = true; break;
-                    case SHIFT: running = true; break;
                     default: break;
                 }
             }
@@ -466,7 +469,6 @@ public class Gui {
                     case S:     goSouth = false; break;
                     case A:     goWest  = false; break;
                     case D:     goEast  = false; break;
-                    case SHIFT: running = false; break;
                     default: break;
                 }
             }
@@ -477,12 +479,11 @@ public class Gui {
             public void handle(long now) {
                 int dx = 0, dy = 0;
 
-                if (goNorth) dy -= 1;
-                if (goSouth) dy += 1;
-                if (goEast)  dx += 1;
-                if (goWest)  dx -= 1;
-                if (running) { dx *= 3; dy *= 3; }
-
+                if (goNorth) dy -= 3;
+                if (goSouth) dy += 3;
+                if (goEast)  dx += 3;
+                if (goWest)  dx -= 3;
+ 
                 moveHeroBy(dx, dy);
             }
         };
@@ -519,8 +520,11 @@ public class Gui {
             player.setPosY(newY);
 
             this.hero.relocate(newX, newY);
-            this.hero.toFront(); // TODO: not working
+            this.hero.toFront(); // TODO: not working as intended
             Constants.GL_PAUSED = false;
+            if (this.messageLabel != null && !this.messageLabel.getText().contains("Door key found")) {
+                showMessage(""); // hide message
+            }
         }
         else if (hitObject != null) {
             handleHitObject(hitObject, hitNode, newX, newY);
@@ -551,8 +555,8 @@ public class Gui {
                 if (playerObject instanceof Key) {
                     Key key = (Key) playerObject;
                     if (key.isMaster()) {
-                        this.messageLabel.setText("YOU BEAT GAME!");
-                        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
+                        this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
+                        showMessage("CONGRATULATIONS, YOU ESCAPED THE BASEMENT!");
                         this.timer.stop();
                         this.gameBeat = true;
                     }
@@ -565,10 +569,11 @@ public class Gui {
     private void tryUnlockChest(Container chest, GameObject hitObject, Node hitNode) {
         boolean chestUnlocked = false;
         GameObject objToRemove = null;
+        Key key = null;
         // try to unlock with all keys in inventory
         for (GameObject playersObject: player.getInventory().getInventory()) {
             if (playersObject instanceof Key) {
-                Key key = (Key) playersObject;
+                key = (Key) playersObject;
                 if (key.getId() == chest.getId()) {
                     chestUnlocked = true;
                     objToRemove = playersObject;
@@ -587,10 +592,12 @@ public class Gui {
                 GameObject keyToTake = chest.getInventory().getInventory()[0];
                 player.getInventory().addToInventory(player.getInventory(), keyToTake); // add master key to player inv
                 chest.getInventory().remove(keyToTake); // remove from chest inv
-                this.messageLabel.setText("DOOR KEY FOUND");
-                this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
+                showMessage("Door key found, head to the exit!");
                 this.doorKeyFound = true;
-            }      
+            }
+            else {
+                showMessage("Opened the chest but nothing was found inside, the key " + key.getId() + " vanished");
+            }
             // refresh inventories
             hideInventory(true);
             setUpInventory(player.getInventory(), player);                   
@@ -601,6 +608,11 @@ public class Gui {
 
 	public void setTimer(AnimationTimer timer) {
         this.timer = timer;
+	}
+
+	public void showMessage(String string) {
+        this.messageLabel.setText(string);
+        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default capital font seems to be about 5 px wide/char
 	}
 
 	
