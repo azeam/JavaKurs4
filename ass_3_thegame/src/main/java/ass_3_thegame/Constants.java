@@ -17,15 +17,15 @@ public class Constants {
                             INV_SIZE_NPC = 1, // should not be set higher, only set up for 1
                             INV_SIZE_NPC_MIN = 0,
                             INV_SIZE_ROOM = 5,
-                            INV_SIZE_ROOM_MIN = 0,
+                            INV_SIZE_ROOM_MIN = 1,
                             INV_SIZE_PLAYER = 5,
                             MARGIN = 50,
                             NUM_NPCS = 10, // API max is 10
                             NUM_ROOMS = 4, // 2 min
                             WINDOW_WIDTH = NUM_ROOMS * ROOM_WIDTH + 2 * MARGIN,
                             ALL_ROOMS_WIDTH = NUM_ROOMS * ROOM_WIDTH,
-	                        PLAYER_WIDTH = 40, // set to img values for hitbox
-                            PLAYER_HEIGHT = 38,  // set to img values for hitbox
+	                        PLAYER_WIDTH = 30, // set to img values for hitbox
+                            PLAYER_HEIGHT = 30,  // set to img values for hitbox
                             DOOR_HEIGHT = 50; // more looks better but placing objects needs to be fixed or there is higher chance of getting stuck in rooms
 
     public static final String  

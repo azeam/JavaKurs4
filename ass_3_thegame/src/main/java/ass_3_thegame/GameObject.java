@@ -15,12 +15,15 @@ public abstract class GameObject {
         if (room != null) {
             int roomNumber = room.getRoomId();    
                 do {
-                    this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.ROOM_WIDTH * roomNumber + Constants.OBJ_SIZE, Constants.ROOM_WIDTH * (roomNumber + 1) - Constants.OBJ_SIZE + Constants.MARGIN);
-                    this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, Constants.ROOM_HEIGHT - Constants.OBJ_SIZE + Constants.MARGIN); 
-                } while (this.posX > Constants.MARGIN + Constants.ROOM_WIDTH / 2 - Constants.PLAYER_WIDTH &&
-                            this.posX < Constants.MARGIN + Constants.ROOM_WIDTH / 2 + Constants.PLAYER_WIDTH && 
-                            this.posY > Constants.MARGIN + Constants.ROOM_HEIGHT / 2 - Constants.PLAYER_HEIGHT &&
-                            this.posY < Constants.MARGIN + Constants.ROOM_HEIGHT / 2 + Constants.PLAYER_HEIGHT);
+                    // set some margins near room openings to prevent getting stuck in room
+                    this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.ROOM_WIDTH * roomNumber + Constants.OBJ_SIZE * 2, 
+                                                                    Constants.ROOM_WIDTH * (roomNumber + 1) - Constants.OBJ_SIZE * 2 + Constants.MARGIN);
+                    this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, 
+                                                                    Constants.ROOM_HEIGHT - Constants.OBJ_SIZE + Constants.MARGIN); 
+                } while ((this.posX + Constants.OBJ_SIZE > Constants.MARGIN + Constants.ROOM_WIDTH / 2 - Constants.PLAYER_WIDTH &&
+                        this.posX + Constants.OBJ_SIZE < Constants.MARGIN + Constants.ROOM_WIDTH / 2 + Constants.PLAYER_WIDTH) && 
+                        (this.posY + Constants.OBJ_SIZE > Constants.MARGIN + Constants.ROOM_HEIGHT / 2 - Constants.PLAYER_HEIGHT &&
+                        this.posY + Constants.OBJ_SIZE < Constants.MARGIN + Constants.ROOM_HEIGHT / 2 + Constants.PLAYER_HEIGHT));
         } 
     }
 

@@ -81,7 +81,7 @@ public class Gui {
         stage.show();
     }
 
-    public void setUpWalls() {
+    public void setUpWallsAndLabels() {
         for (int i = 1; i < this.roomGroup.size(); i++) {
             if (this.roomGroup.get(i).getRoomId() % 2 == 0) {
                 paintInnerWalls(this.roomGroup.get(i).getRoomId(), "up");
@@ -90,20 +90,20 @@ public class Gui {
             }
         }
         this.playerLabel = new Label("Inventory of " + Constants.PLAYER_NAME);
-        this.playerLabel.setTranslateX(Constants.WINDOW_WIDTH / 2 + Constants.MARGIN);
-        this.playerLabel.setTranslateY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
+        this.playerLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 + Constants.MARGIN);
+        this.playerLabel.setLayoutY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
         this.playerLabel.setId("playerLabel");
         this.playerLabel.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(5.0), new Insets(-5.0))));
         this.playerLabel.setTextFill(Color.WHITE);
         this.otherInvLabel = new Label();
-        this.otherInvLabel.setTranslateX(Constants.MARGIN);
-        this.otherInvLabel.setTranslateY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
+        this.otherInvLabel.setLayoutX(Constants.MARGIN);
+        this.otherInvLabel.setLayoutY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
         this.otherInvLabel.setId("otherInvLabel");
         this.otherInvLabel.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(5.0), new Insets(-5.0))));
         this.otherInvLabel.setTextFill(Color.WHITE);
         this.messageLabel = new Label();
-        this.messageLabel.setTranslateX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5); // default capital font seems to be about 5 px wide/char
-        this.messageLabel.setTranslateY(Constants.MARGIN / 2 - 8);
+        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5); // default capital font seems to be about 5 px wide/char
+        this.messageLabel.setLayoutY(Constants.MARGIN / 2 - 8);
         this.messageLabel.setId("messageLabel");
         this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
         this.messageLabel.setTextFill(Color.WHITE);
@@ -111,7 +111,6 @@ public class Gui {
         showObj(playerLabel);
         showObj(messageLabel);
         paintWalls();
-        
     }
 
     public void setUpInventory(Inventory inventory, Object owner) {
@@ -567,6 +566,7 @@ public class Gui {
                     Key key = (Key) playerObject;
                     if (key.isMaster()) {
                         this.messageLabel.setText("YOU BEAT GAME!");
+                        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
                         this.timer.stop();
                         this.gameBeat = true;
                     }
@@ -602,6 +602,7 @@ public class Gui {
                 player.getInventory().addToInventory(player.getInventory(), keyToTake); // add master key to player inv
                 chest.getInventory().remove(keyToTake); // remove from chest inv
                 this.messageLabel.setText("DOOR KEY FOUND");
+                this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
                 this.doorKeyFound = true;
             }      
             // refresh inventories

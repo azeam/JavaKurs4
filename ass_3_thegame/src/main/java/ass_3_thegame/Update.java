@@ -28,7 +28,7 @@ public class Update implements Runnable {
         gui.setRoomGroup(roomGroup);
         placeMasterKey(roomGroup);
         Platform.runLater(() -> {
-            gui.setUpWalls(); // set up walls and items before persons to check for wall collision
+            gui.setUpWallsAndLabels(); // set up walls and items before persons to check for wall collision
             gui.setUpInventory(player.getInventory(), player);
             gui.setUpItems();    
         });
