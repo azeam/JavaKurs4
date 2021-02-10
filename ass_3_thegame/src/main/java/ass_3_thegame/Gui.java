@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -59,19 +58,18 @@ public class Gui {
         this.player = player;
         Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
         this.background = canvasBG.getGraphicsContext2D();
-
         this.hero = new ImageView(heroImage);
 
-        Group dungeon = new Group(hero);
+        Group basement = new Group(hero);
 
         this.root.setFocusTraversable(true);
         this.root.getChildren().add(canvasBG);
-        this.root.getChildren().add(dungeon);
+        this.root.getChildren().add(basement);
         this.root.setBackground(Background.EMPTY); // needed for labels to not remove gc bg color
         Scene scene = new Scene(root, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT, Color.BLACK);
 
-        dungeon.requestFocus();
-        setHeroMovement(dungeon);
+        basement.requestFocus();
+        setHeroMovement(basement);
         moveHeroTo(Constants.MARGIN + Constants.ROOM_WIDTH / 2, Constants.MARGIN + Constants.ROOM_HEIGHT / 2);
 
         stage.setResizable(false);
@@ -107,9 +105,7 @@ public class Gui {
         this.messageLabel.setId("messageLabel");
         this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
         this.messageLabel.setTextFill(Color.WHITE);
-        showObj(otherInvLabel);
-        showObj(playerLabel);
-        showObj(messageLabel);
+        this.root.getChildren().addAll(otherInvLabel, playerLabel, messageLabel);
         paintWalls();
     }
 
@@ -138,8 +134,9 @@ public class Gui {
 
     // update npc position in GUI
     public void paint(ArrayList<Npc> personGroup) {
+        Npc person;
         for (int i = 0; i < personGroup.size(); i++) {
-            Npc person = personGroup.get(i);
+            person = personGroup.get(i);
             if (person.isCarrying()) {
                 this.personsList.get(i).setImage(monsterItemImage);
             } else {
@@ -206,12 +203,10 @@ public class Gui {
                     itemImg.getStyleClass().add("leftItem");
                 }
                 itemImg.setUserData(gameObject);
-                showObj(itemImg);
+                this.root.getChildren().add(itemImg);
             }
         }
     }
-
-    // TODO: confirm all painting is done on fx thread, everything invoked from player should be since it's on timer
 
     // if possible to trade, show trade image when selecting player item
     private EventHandler<MouseEvent> inventoryItemClicked(ImageView itemImg, Object ownerType, GameObject gameObject) {
@@ -240,7 +235,7 @@ public class Gui {
                     });
                     exImgView.getStyleClass().add("leftItem");
                     exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
-                    showObj(exImgView);
+                    root.getChildren().add(exImgView);
                 }
             }
 
@@ -319,14 +314,14 @@ public class Gui {
             this.background.setFill(Color.WHITE);
             this.background.fillRect(nodeWall.getX(), nodeWall.getY(), nodeWall.getWidth(), nodeWall.getHeight());
         }
-        showObj(door);
+        this.root.getChildren().add(door);
     }
 
     public void setUpPerson(ArrayList<Npc> personGroup) {
         for (int i = 0; i < personGroup.size(); i++) {
             ImageView monster = new ImageView(monsterImage);
             this.personsList.add(monster);
-            showObj(monster);
+            this.root.getChildren().add(monster);
         }
     }
 
@@ -436,29 +431,20 @@ public class Gui {
             itemImg.setY(g.getPosY());
             this.itemsList.add(itemImg);
             this.itemsObjList.add(g);
-            showObj(itemImg);
+            this.root.getChildren().add(itemImg);
         }         
-    }
-
-    private void showObj(Node node) {
-        Platform.runLater(() -> {
-            this.root.getChildren().add(node);
-        });
     }
 
     public void removeObj(GameObject object, Node item) {
         this.itemsList.remove(item);
         this.itemsObjList.remove(object);
-        Platform.runLater(() -> {
-            System.out.println("removing object " + object.toString() + " item " + item);
-            this.root.getChildren().remove(item);
-        });  
-        
+        System.out.println("removing object " + object.toString() + " item " + item);
+        this.root.getChildren().remove(item);        
     }
 
     // hero movement based on https://gist.github.com/jewelsea/8321740
-    private void setHeroMovement(Group dungeon) {
-        dungeon.setOnKeyPressed(new EventHandler<KeyEvent>() {
+    private void setHeroMovement(Group basement) {
+        basement.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
@@ -472,7 +458,7 @@ public class Gui {
             }
         });
 
-        dungeon.setOnKeyReleased(new EventHandler<KeyEvent>() {
+        basement.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {

@@ -7,9 +7,7 @@ public class Game {
     public Game(Stage stage){
         Player player = new Player();
         this.gui = new Gui(stage, player);
-
         (new Thread(new Update(this.gui, player))).start();
-
     }
 
 }

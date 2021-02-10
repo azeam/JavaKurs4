@@ -10,8 +10,7 @@ public abstract class GameObject {
     protected int id;
 
     public GameObject(Room room, int id) {
-        // TODO: test this, item should not be placed where char is - should be fixed
-        // only place within room bounds
+        // only place within room bounds and not on top of player
         if (room != null) {
             int roomNumber = room.getRoomId();    
                 do {

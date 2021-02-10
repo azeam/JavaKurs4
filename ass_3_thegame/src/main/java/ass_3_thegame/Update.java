@@ -12,33 +12,18 @@ import javafx.application.Platform;
 
 public class Update implements Runnable {
 
-    // Ska implementera Runnable och starta en tråd som Regelbundet updaterar Guit
-    // utifrån vad som händer i spelet.
-    Gui gui;
-    Names names = new Names();
-    NpcFactory npcFactory = new NpcFactory();
-    RoomFactory roomFactory = new RoomFactory();
+    private Gui gui;
+    private Names names = new Names();
+    private NpcFactory npcFactory = new NpcFactory();
+    private RoomFactory roomFactory = new RoomFactory();
     private ArrayList<Room> roomGroup;
     private List<String> namesList;
     private ArrayList<Npc> personGroup;
+    private Player player;
 
     public Update(Gui gui, Player player) {
         this.gui = gui;
-        roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
-        gui.setRoomGroup(roomGroup);
-        placeMasterKey(roomGroup);
-        Platform.runLater(() -> {
-            gui.setUpWallsAndLabels(); // set up walls and items before persons to check for wall collision
-            gui.setUpInventory(player.getInventory(), player);
-            gui.setUpItems();    
-        });
-        
-        namesList = names.getRandomNames(Constants.NUM_NPCS);
-        personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, gui);
-        
-        Platform.runLater(() -> {
-            gui.setUpPerson(personGroup);
-        });
+        this.player = player;
     }
 
     private void placeMasterKey(ArrayList<Room> roomGroup2) {
@@ -55,8 +40,8 @@ public class Update implements Runnable {
                 }
             }
         }
+        
         // make master key and place it in a random chest, the other chests are empty
-        // TODO: fix, at least one chest should be made or restart game
         if (containers.size() > 0) {
             int masterPos = ThreadLocalRandom.current().nextInt(0, containers.size());
             GameObjectFactory gameObjectFactory = new GameObjectFactory();
@@ -68,6 +53,21 @@ public class Update implements Runnable {
 
     @Override
     public void run() {
+        roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
+        gui.setRoomGroup(roomGroup);
+        placeMasterKey(roomGroup);
+        Platform.runLater(() -> {
+            gui.setUpWallsAndLabels(); // set up walls and items before persons to check for wall collision
+            gui.setUpInventory(this.player.getInventory(), this.player);
+            gui.setUpItems();    
+        });
+        
+        namesList = names.getRandomNames(Constants.NUM_NPCS);
+        personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, gui);
+        
+        Platform.runLater(() -> {
+            gui.setUpPerson(personGroup);
+        });
         updateGui(personGroup, roomGroup);
     }
 
