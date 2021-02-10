@@ -123,20 +123,16 @@ public class Gui {
         if (both) {
             this.background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH - Constants.MARGIN,
             Constants.ROOM_HEIGHT);
-            Platform.runLater(() -> {
-                // needs loop because lookup only returns first item, does not work by eg. setting node to class and removing it, different reference
-                for (int i = 0; i < Constants.INV_SIZE_PLAYER; i++) {
-                    this.root.getChildren().remove(this.root.lookup(".rightItem"));
-                }
-            });
+            // needs loop because lookup only returns first item, does not work by eg. setting node to class and removing it, different reference
+            for (int i = 0; i < Constants.INV_SIZE_PLAYER; i++) {
+                this.root.getChildren().remove(this.root.lookup(".rightItem"));
+            }
         }
         else {
             this.background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
             Constants.ROOM_HEIGHT);
         }
-        Platform.runLater(() -> {
-            this.root.getChildren().remove(this.root.lookup(".leftItem"));
-        });
+        this.root.getChildren().remove(this.root.lookup(".leftItem"));
     }
 
     public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
@@ -170,9 +166,11 @@ public class Gui {
                 }
                 itemImg.setX(x);
                 itemImg.setY(y);
-                this.background.fillText(gameObject.toString(), x, y); // TODO: WTF, changing this does nothing and text remains????
+                this.background.fillText(gameObject.toString(), x, y);
                 
                 itemImg.getStyleClass().clear();
+                itemsList.add(itemImg);
+                itemsObjList.add(gameObject);
                 if (owner == Constants.PLAYER_NAME) {
                     itemImg.setOnMouseClicked(inventoryItemClicked(itemImg, ownerType, gameObject));
                     itemImg.getStyleClass().add("rightItem");
@@ -186,20 +184,20 @@ public class Gui {
         }
     }
 
+    // TODO: confirm all painting is done on fx thread, everything invoked from player should be since it's on timer
+
     // if possible to trade, show trade image when selecting player item
     private EventHandler<MouseEvent> inventoryItemClicked(ImageView itemImg, Object ownerType, GameObject gameObject) {
         return new EventHandler<MouseEvent>() {
             @Override
-            public void handle(MouseEvent event) {                    
-                itemImg.setOpacity(0.2); 
+            public void handle(MouseEvent event) {     
+                
+                for (int i = 0; i < itemsList.size(); i++) {
+                    itemsList.get(i).setOpacity(1);                        
+                }               
+                itemImg.setOpacity(0.3);
+            
                 player.setSelectedPlayerObject(gameObject);
-                System.out.println(itemImg.getStyleClass());
-                    // TODO: disable selection for other keys
-                    /*
-                    for (ImageView itemImg : itemsList) {
-                        itemImg.removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
-                    }
-                */
                 if (Constants.GL_NPC_HIT != null) {
                     Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
                     ImageView exImgView = new ImageView(exImage);
@@ -220,15 +218,18 @@ public class Gui {
                         Inventory npcInv = person.getInventory();
                         GameObject itemToAddPlayer = npcInv.getInventory()[0];
                         GameObject itemToAddNpc = player.getSelectedPlayerObject();
-                        npcInv.remove(npcInv.getInventory()[0]);
-                        player.getInventory().remove(player.getSelectedPlayerObject());
-                        npcInv.addToInventory(npcInv, itemToAddNpc);
-                        player.getInventory().addToInventory(player.getInventory(), itemToAddPlayer);
-
-                        hideInventory(true);
-                        setUpInventory(player.getInventory(), player);
-                        setUpInventory(person.getInventory(), person);
-                        person.setDirection(Direction.getOpposite(person.getDirection()));
+                        if (itemToAddNpc != null && itemToAddPlayer != null) {
+                            npcInv.remove(npcInv.getInventory()[0]);
+                            player.getInventory().remove(player.getSelectedPlayerObject());
+                            npcInv.addToInventory(npcInv, itemToAddNpc);
+                            player.getInventory().addToInventory(player.getInventory(), itemToAddPlayer);
+    
+                            hideInventory(true);
+                            setUpInventory(player.getInventory(), player);
+                            setUpInventory(person.getInventory(), person);
+                            person.setDirection(Direction.getOpposite(person.getDirection()));
+                            player.setSelectedPlayerObject(null); // reset selection after trading
+                        }
                     }
                 };
             }
@@ -553,22 +554,23 @@ public class Gui {
         }
 
         // if player unlocks chest, remove the key from game
-        if (chestUnlocked) {
+        if (chestUnlocked && objToRemove instanceof Key) {
             chest.setOpen(true);
-            addItem(chest); // add open chest img
-            removeObj(hitObject, hitNode); // remove locked chest img
+            ImageView lockedChest = (ImageView) hitNode;
+            lockedChest.setImage(chestOpenImage);
             player.getInventory().remove(objToRemove); // remove key from player inv
             if (chest.getInventory().getInventory()[0] != null) {
                 GameObject keyToTake = chest.getInventory().getInventory()[0];
                 player.getInventory().addToInventory(player.getInventory(), keyToTake); // add master key to player inv
                 chest.getInventory().remove(keyToTake); // remove from chest inv
                 this.background.fillText("MASTER KEY FOUND", Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT - 200);
-            }                         
+            }      
+            // refresh inventories
+            hideInventory(true);
+            setUpInventory(player.getInventory(), player);                   
         }
-        // refresh inventories
-        hideInventory(true);
+        hideInventory(false);
         setUpInventory(chest.getInventory(), chest); 
-        setUpInventory(player.getInventory(), player);
     }
 
 	

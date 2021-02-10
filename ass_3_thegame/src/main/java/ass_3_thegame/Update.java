@@ -8,6 +8,7 @@ import ass_3_thegame.factories.GameObjectFactory;
 import ass_3_thegame.factories.NpcFactory;
 import ass_3_thegame.factories.RoomFactory;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 
 public class Update implements Runnable {
 
@@ -26,15 +27,18 @@ public class Update implements Runnable {
         roomGroup = roomFactory.createGroup(Constants.NUM_ROOMS);
         gui.setRoomGroup(roomGroup);
         placeMasterKey(roomGroup);
-        gui.setUpWalls(); // set up walls and items before persons to check for wall collision
-        gui.setUpInventory(player.getInventory(), player);
-        gui.setUpItems();
+        Platform.runLater(() -> {
+            gui.setUpWalls(); // set up walls and items before persons to check for wall collision
+            gui.setUpInventory(player.getInventory(), player);
+            gui.setUpItems();    
+        });
         
         namesList = names.getRandomNames(Constants.NUM_NPCS);
         personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, gui);
         
-        gui.setUpPerson(personGroup);
-        
+        Platform.runLater(() -> {
+            gui.setUpPerson(personGroup);
+        });
     }
 
     private void placeMasterKey(ArrayList<Room> roomGroup2) {
