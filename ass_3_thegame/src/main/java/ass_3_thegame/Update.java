@@ -1,15 +1,8 @@
 package ass_3_thegame;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import ass_3_thegame.factories.GameObjectFactory;
 import ass_3_thegame.factories.NpcFactory;
@@ -27,33 +20,12 @@ public class Update implements Runnable {
     private List<String> namesList;
     private ArrayList<Npc> personGroup;
     private Player player;
-    private Clip clip;
     private boolean paused = false;
 
     public Update(Gui gui, Player player) {
         this.gui = gui;
         this.player = player;
         gui.setUpdateRef(this);
-    }
-
-    public void musicPlayer(String action, String file, boolean loop) {
-        try {
-            if (action.equals("stop")) {
-                clip.stop();
-                clip.close();
-                clip = null;
-                return;
-            }
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Update.class.getResource(file));
-            clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
-            if (loop) {
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
-            }
-            clip.start();
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            e.printStackTrace();
-        }
     }
 
     private void placeMasterKey(ArrayList<Room> roomGroup2) {
@@ -98,7 +70,7 @@ public class Update implements Runnable {
         Platform.runLater(() -> {
             gui.setUpPerson(personGroup);
         });
-        musicPlayer("start", "/loop.wav", true);
+        
         updateGui(personGroup, roomGroup);
     }
 
@@ -145,7 +117,15 @@ public class Update implements Runnable {
                             
                             int behindX = person.getPosX() - behind.getX() * Constants.OBJ_SIZE;
                             int behindY = person.getPosY() - behind.getY() * Constants.OBJ_SIZE;
-                            
+
+                            // set some margins when going up/left or they will be within hitbox and pick up immediately
+                            if (behind.getX() < 0) {
+                                behindX = behindX + 10;
+                            }
+                            if (behind.getY() < 0) {
+                                behindY = behindY + 10;
+                            }
+
                             GameObject item = person.getInventory().getInventory()[0];
                             if (!gui.wallCollision(behindX, behindY, Constants.OBJ_SIZE, Constants.OBJ_SIZE) && person.getInventory().exchangeItem(item, room.getInventory(), "npcDropoff", behindX, behindY)) {
                                 gui.addItem(item);

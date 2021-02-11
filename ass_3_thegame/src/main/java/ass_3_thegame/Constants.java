@@ -1,6 +1,8 @@
 package ass_3_thegame;
 
-public class Constants {    
+import javafx.scene.image.Image;
+
+public class Constants {
     // values that could be placed in a settings menu (most of them)
     public final static int 
                             WINDOW_HEIGHT = 800,
@@ -42,6 +44,27 @@ public class Constants {
                             EXCHANGE_IMAGE_LOC = "exchange.png",
                             CHEST_IMAGE_LOC = "chest.png",
                             CHEST_OPEN_IMAGE_LOC = "chest_open.png",
-                            DOOR_IMAGE_LOC = "door.png";
+                            DOOR_IMAGE_LOC = "door.png",
+                            SOUND_PICKUP = "/pickup.wav",
+                            SOUND_DOORKEY_PICKUP = "/doorKeyPickup.wav",
+                            SOUND_EMPTY = "/empty.wav",
+                            SOUND_LOOP = "/loop.wav",
+                            SOUND_WIN = "/win.wav";
+
+    public final Image heroImage1 = new Image(getClass().getResource("/hero1.png").toExternalForm());
+    public final Image heroImage2 = new Image(getClass().getResource("/hero2.png").toExternalForm());
+    public final Image heroImage3 = new Image(getClass().getResource("/hero3.png").toExternalForm());
+    public final Image monsterImage1 = new Image(getClass().getResource("/monster1.png").toExternalForm());
+    public final Image monsterItemImage1 = new Image(getClass().getResource("/monster_item1.png").toExternalForm());
+    public final Image monsterImage2 = new Image(getClass().getResource("/monster2.png").toExternalForm());
+    public final Image monsterItemImage2 = new Image(getClass().getResource("/monster_item2.png").toExternalForm());
+    public final Image monsterImage3 = new Image(getClass().getResource("/monster3.png").toExternalForm());
+    public final Image monsterItemImage3 = new Image(getClass().getResource("/monster_item3.png").toExternalForm());
+    public final Image keyImage = new Image(getClass().getResource("/key.png").toExternalForm());
+    public final Image keyMasterImage = new Image(getClass().getResource("/key_master.png").toExternalForm());
+    public final Image keyGroundImage = new Image(getClass().getResource("/key_ground.png").toExternalForm());
+    public final Image chestImage = new Image(getClass().getResource("/chest.png").toExternalForm());
+    public final Image chestOpenImage = new Image(getClass().getResource("/chest_open.png").toExternalForm());
+    public final Image doorImage = new Image(getClass().getResource("/door.png").toExternalForm());
 
 }
