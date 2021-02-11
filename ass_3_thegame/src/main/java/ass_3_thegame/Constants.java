@@ -3,32 +3,36 @@ package ass_3_thegame;
 import javafx.scene.image.Image;
 
 public class Constants {
-    // values that could be placed in a settings menu (most of them)
-    public final static int 
-                            WINDOW_HEIGHT = 800,
+    // values that could be placed in a settings menu
+    public static int 
                             ROOM_WIDTH = 300,
-                            ROOM_HEIGHT = 200,
-                            NPC_WIDTH = 32,  // set to img values for hitbox
-                            NPC_HEIGHT = 32, // set to img values for hitbox
-                            OBJ_SIZE = 25,
-                            WALL_SIZE = 120,
-                            WALL_WIDTH = 2,
-                            INV_SIZE_NPC = 1, // should not be set higher, only set up for 1
-                            INV_SIZE_NPC_MIN = 0,
+                            ROOM_HEIGHT = 400,
+                            NUM_NPCS = 10, // API max is 10
+                            NUM_ROOMS = 5, // 2 min                            
                             INV_SIZE_ROOM = 5,
                             INV_SIZE_ROOM_MIN = 1,
-                            INV_SIZE_PLAYER = 5,
+                            INV_SIZE_PLAYER = 5;
+    public static String  
+                            PLAYER_NAME = "Azeam",
+                            DIFFICULTY = "Normal"; // only East and Normal implemented
+    
+    // final values that should probably not be changed
+    public final static int 
+                            WALL_SIZE = ROOM_HEIGHT - 80,
+                            INV_SIZE_NPC = 1, // should not be set higher, only set up for 1
+                            INV_SIZE_NPC_MIN = 0,
+                            WALL_WIDTH = 2,
                             MARGIN = 50,
-                            NUM_NPCS = 10, // API max is 10
-                            NUM_ROOMS = 4, // 2 min
+                            NPC_WIDTH = 32,  // set to img values for hitbox
+                            NPC_HEIGHT = 32, // set to img values for hitbox
+                            OBJ_SIZE = 25, // set to img values for hitbox
+                            WINDOW_HEIGHT = ROOM_HEIGHT + 300,
                             WINDOW_WIDTH = NUM_ROOMS * ROOM_WIDTH + 2 * MARGIN,
                             ALL_ROOMS_WIDTH = NUM_ROOMS * ROOM_WIDTH,
 	                        PLAYER_WIDTH = 32, // set to img values for hitbox
-                            PLAYER_HEIGHT = 32,  // set to img values for hitbox
-                            DOOR_HEIGHT = 50; // more looks better but placing objects needs to be fixed or there is higher chance of getting stuck in rooms
+                            PLAYER_HEIGHT = 32;  // set to img values for hitbox
 
-    public static final String  
-                            PLAYER_NAME = "Azeam",
+    public final static String   
                             HERO_IMAGE_LOC1 = "hero1.png",
                             HERO_IMAGE_LOC2 = "hero2.png",
                             HERO_IMAGE_LOC3 = "hero3.png",

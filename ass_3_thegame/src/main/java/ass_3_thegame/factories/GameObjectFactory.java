@@ -14,7 +14,14 @@ public class GameObjectFactory {
     public GameObject createGameObject(boolean onlyPickable, Room room, boolean isMaster) {
 
         // random id, half of max total possible items, should be a good number to make it completable sometimes and sometimes not
-        int id = ThreadLocalRandom.current().nextInt(0, (Constants.NUM_ROOMS * Constants.INV_SIZE_ROOM / 2) + 1);
+        int id = 0;
+        if (Constants.DIFFICULTY == "Normal") {
+            id = ThreadLocalRandom.current().nextInt(0, (Constants.NUM_ROOMS * Constants.INV_SIZE_ROOM / 2) + 1);
+        }
+        else if (Constants.DIFFICULTY == "Easy") {
+            id = ThreadLocalRandom.current().nextInt(0, (Constants.NUM_ROOMS * Constants.INV_SIZE_ROOM / 4) + 1);
+        }
+        
         if (isMaster) {
             id = 999;
         }
