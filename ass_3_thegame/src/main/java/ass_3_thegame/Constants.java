@@ -13,7 +13,7 @@ public class Constants {
                             NPC_HEIGHT = 32, // set to img values for hitbox
                             OBJ_SIZE = 25,
                             WALL_SIZE = 120,
-                            WALL_WIDTH = 1,
+                            WALL_WIDTH = 2,
                             INV_SIZE_NPC = 1, // should not be set higher, only set up for 1
                             INV_SIZE_NPC_MIN = 0,
                             INV_SIZE_ROOM = 5,

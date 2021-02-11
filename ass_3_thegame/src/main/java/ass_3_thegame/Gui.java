@@ -350,7 +350,13 @@ public class Gui {
 
     public void setUpPerson(ArrayList<Npc> personGroup) {
         for (int i = 0; i < personGroup.size(); i++) {
-            ImageView monster = new ImageView(monsterImage1);
+            ImageView monster;
+            if (personGroup.get(i).isCarrying()) {
+                monster = new ImageView(monsterItemImage1);
+            }
+            else {
+                monster = new ImageView(monsterImage1);
+            }
             monsterImageUpdates.add(0);
             this.personsList.add(monster);
             this.root.getChildren().add(monster);
