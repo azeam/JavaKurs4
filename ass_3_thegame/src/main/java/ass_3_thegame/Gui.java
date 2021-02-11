@@ -1,7 +1,14 @@
 package ass_3_thegame;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
@@ -14,7 +21,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -65,6 +71,7 @@ public class Gui {
 
     private int changeHeroImg = 0;
     private Stage stage;
+    private Npc hitPerson;
 
     // set up base GUI items
     public Gui(Stage stage, Player player) {
@@ -112,10 +119,17 @@ public class Gui {
         this.otherInvLabel.setId("otherInvLabel");
         this.otherInvLabel.setTextFill(Color.WHITE);
         this.messageLabel = new Label();
-        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default capital font seems to be about 5 px wide/char
+        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default
+                                                                                                             // capital
+                                                                                                             // font
+                                                                                                             // seems to
+                                                                                                             // be about
+                                                                                                             // 5 px
+                                                                                                             // wide/char
         this.messageLabel.setLayoutY(Constants.MARGIN / 2 - 8);
         this.messageLabel.setId("messageLabel");
-        this.messageLabel.setBackground(new Background(new BackgroundFill(Color.PURPLE, new CornerRadii(5.0), new Insets(-5.0))));
+        this.messageLabel.setBackground(
+                new Background(new BackgroundFill(Color.PURPLE, new CornerRadii(5.0), new Insets(-5.0))));
         this.messageLabel.setTextFill(Color.WHITE);
         this.root.getChildren().addAll(otherInvLabel, playerLabel, messageLabel);
         paintWalls();
@@ -155,11 +169,9 @@ public class Gui {
             if (person.isCarrying()) {
                 if (monsterInt == 20) {
                     this.personsList.get(i).setImage(monsterItemImage1);
-                }
-                else if (monsterInt == 40) {
+                } else if (monsterInt == 40) {
                     this.personsList.get(i).setImage(monsterItemImage2);
-                }
-                else if (monsterInt == 60) {
+                } else if (monsterInt == 60) {
                     monsterInt = 0;
                     monsterImageUpdates.set(i, monsterInt);
                     this.personsList.get(i).setImage(monsterItemImage3);
@@ -167,11 +179,9 @@ public class Gui {
             } else {
                 if (monsterInt == 20) {
                     this.personsList.get(i).setImage(monsterImage1);
-                }
-                else if (monsterInt == 40) {
+                } else if (monsterInt == 40) {
                     this.personsList.get(i).setImage(monsterImage2);
-                }
-                else if (monsterInt == 60) {
+                } else if (monsterInt == 60) {
                     monsterInt = 0;
                     monsterImageUpdates.set(i, monsterInt);
                     this.personsList.get(i).setImage(monsterImage3);
@@ -185,28 +195,28 @@ public class Gui {
     // clear painted inventory
     public void hideInventory(boolean both) {
         if (both) {
-            this.background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH - Constants.MARGIN,
-            Constants.ROOM_HEIGHT);
-            // needs loop because lookup only returns first item, does not work by eg. setting node to class and removing it, different reference
+            this.background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5,
+                    Constants.WINDOW_WIDTH - Constants.MARGIN, Constants.ROOM_HEIGHT);
+            // needs loop because lookup only returns first item, does not work by eg.
+            // setting node to class and removing it, different reference
             for (int i = 0; i < Constants.INV_SIZE_PLAYER; i++) {
                 this.root.getChildren().remove(this.root.lookup(".rightItem"));
             }
-        }
-        else {
-            this.background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5, Constants.WINDOW_WIDTH / 2 - Constants.MARGIN,
-            Constants.ROOM_HEIGHT);
+        } else {
+            this.background.clearRect(0, Constants.MARGIN + Constants.ROOM_HEIGHT + 5,
+                    Constants.WINDOW_WIDTH / 2 - Constants.MARGIN, Constants.ROOM_HEIGHT);
         }
         this.otherInvLabel.setText("");
         this.root.getChildren().remove(this.root.lookup(".leftItem"));
     }
 
     public void showInventory(int x, int y, GameObject gameObject, String owner, Object ownerType) {
-        
+
         if (ownerType instanceof Container) {
-            Container chest = (Container) ownerType;       
+            Container chest = (Container) ownerType;
             if (!chest.isOpen()) {
                 int id = chest.getId();
-                showMessage("Unable to unlock. The chest is engraved with the number " + id);                
+                showMessage("Unable to unlock. The chest is engraved with the number " + id);
                 return;
             }
         }
@@ -226,7 +236,7 @@ public class Gui {
                 itemImg.setX(x);
                 itemImg.setY(y);
                 this.background.fillText(gameObject.toString(), x - 2, y - 5);
-                
+
                 itemImg.getStyleClass().clear();
                 itemsList.add(itemImg);
                 itemsObjList.add(gameObject);
@@ -234,8 +244,7 @@ public class Gui {
                     itemImg.setOnMouseClicked(inventoryItemClicked(itemImg, ownerType, gameObject));
                     itemImg.getStyleClass().add("rightItem");
                     itemImg.setStyle("-fx-cursor: hand;");
-                } 
-                else {
+                } else {
                     itemImg.getStyleClass().add("leftItem");
                 }
                 itemImg.setUserData(gameObject);
@@ -249,13 +258,14 @@ public class Gui {
         return new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // disable trading after finding the door key (and completing the game in case npc is on top of player)     
-                if (!gameBeat && !doorKeyFound && Constants.GL_NPC_HIT != null) {
+                // disable trading after finding the door key (and completing the game in case
+                // npc is on top of player)
+                if (!gameBeat && !doorKeyFound && hitPerson != null) {
                     for (int i = 0; i < itemsList.size(); i++) {
-                        itemsList.get(i).setOpacity(1);                        
-                    }               
+                        itemsList.get(i).setOpacity(1);
+                    }
                     itemImg.setOpacity(0.3);
-                
+
                     player.setSelectedPlayerObject(gameObject);
                     Image exImage = new Image(Constants.EXCHANGE_IMAGE_LOC);
                     ImageView exImgView = new ImageView(exImage);
@@ -280,7 +290,7 @@ public class Gui {
                 return new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        Npc person = Constants.GL_NPC_HIT;
+                        Npc person = hitPerson;
                         Inventory npcInv = person.getInventory();
                         GameObject itemToAddPlayer = npcInv.getInventory()[0];
                         GameObject itemToAddNpc = player.getSelectedPlayerObject();
@@ -289,12 +299,13 @@ public class Gui {
                             player.getInventory().remove(player.getSelectedPlayerObject());
                             npcInv.addToInventory(npcInv, itemToAddNpc);
                             player.getInventory().addToInventory(player.getInventory(), itemToAddPlayer);
-    
+
                             hideInventory(true);
                             setUpInventory(player.getInventory(), player);
                             setUpInventory(person.getInventory(), person);
                             person.setDirection(Direction.getOpposite(person.getDirection()));
                             player.setSelectedPlayerObject(null); // reset selection after trading
+                            soundPlayer("/pickup.wav");
                         }
                     }
                 };
@@ -305,11 +316,10 @@ public class Gui {
     private void paintInnerWalls(int order, String doorLocation) {
         Rectangle inner = new Rectangle(Constants.WALL_WIDTH, Constants.WALL_SIZE);
         inner.setX(Constants.MARGIN + Constants.ROOM_WIDTH * order);
-        
+
         if (doorLocation.equals("down")) {
             inner.setY(Constants.MARGIN);
-        }
-        else {
+        } else {
             inner.setY(Constants.ROOM_HEIGHT - Constants.WALL_SIZE + Constants.MARGIN);
         }
         walls.getChildren().add(inner);
@@ -324,7 +334,7 @@ public class Gui {
         Rectangle bottom = new Rectangle(Constants.ALL_ROOMS_WIDTH + Constants.WALL_WIDTH, Constants.WALL_WIDTH);
         bottom.setX(Constants.MARGIN);
         bottom.setY(Constants.MARGIN + Constants.ROOM_HEIGHT);
-        
+
         Rectangle left = new Rectangle(Constants.WALL_WIDTH, Constants.ROOM_HEIGHT);
         left.setX(Constants.MARGIN);
         left.setY(Constants.MARGIN);
@@ -336,11 +346,11 @@ public class Gui {
         itemsList.add(door);
         door.setX(Constants.MARGIN - 10);
         door.setY(Constants.ROOM_HEIGHT);
-        
+
         Rectangle right = new Rectangle(Constants.WALL_WIDTH, Constants.ROOM_HEIGHT);
         right.setX(Constants.MARGIN + Constants.ALL_ROOMS_WIDTH);
         right.setY(Constants.MARGIN);
-        
+
         walls.getChildren().addAll(top, bottom, left, right);
         this.background.setFill(Color.BLACK);
         this.background.fillRect(0, 0, Constants.WINDOW_WIDTH, Constants.ROOM_HEIGHT + Constants.MARGIN * 2);
@@ -354,9 +364,11 @@ public class Gui {
         Button newGameBtn = new Button("New game");
         newGameBtn.setLayoutX(Constants.MARGIN);
         newGameBtn.setLayoutY(Constants.MARGIN - 43);
-        newGameBtn.setStyle("-fx-cursor: hand; -fx-background-color: #090a0c, linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%), linear-gradient(#20262b, #191d22), radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0)); -fx-background-radius: 5,4,3,5; -fx-background-insets: 0,1,2,0; -fx-text-fill: white; -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 ); -fx-text-fill: linear-gradient(white, #d0d0d0); -fx-padding: 10 20 10 20;");
+        newGameBtn.setStyle(
+                "-fx-cursor: hand; -fx-background-color: #090a0c, linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%), linear-gradient(#20262b, #191d22), radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0)); -fx-background-radius: 5,4,3,5; -fx-background-insets: 0,1,2,0; -fx-text-fill: white; -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 ); -fx-text-fill: linear-gradient(white, #d0d0d0); -fx-padding: 10 20 10 20;");
         newGameBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
+            @Override
+            public void handle(ActionEvent e) {
                 update.musicPlayer("stop", "", false);
                 Player player = new Player();
                 Gui gui = new Gui(stage, player);
@@ -372,8 +384,7 @@ public class Gui {
             ImageView monster;
             if (personGroup.get(i).isCarrying()) {
                 monster = new ImageView(monsterItemImage1);
-            }
-            else {
+            } else {
                 monster = new ImageView(monsterImage1);
             }
             monsterImageUpdates.add(0);
@@ -384,14 +395,14 @@ public class Gui {
 
     public void setUpItems() {
         for (int i = 0; i < this.roomGroup.size(); i++) {
-            for (GameObject g: this.roomGroup.get(i).getInventory().getInventory()) {
+            for (GameObject g : this.roomGroup.get(i).getInventory().getInventory()) {
                 if (g != null) {
                     addItem(g);
-                }    
+                }
             }
         }
     }
-    
+
     public boolean wallCollision(int nextX, int nextY, int hitboxX, int hitboxY) {
         Rectangle nodeWall, rectPerson;
         Shape intersect;
@@ -403,7 +414,7 @@ public class Gui {
             intersect = Shape.intersect(nodeWall, rectPerson);
             if (intersect.getBoundsInParent().getWidth() > 0) {
                 return true;
-            } 
+            }
         }
         return false;
     }
@@ -411,7 +422,7 @@ public class Gui {
     public boolean playerNpcCollision(Npc person, int newX, int newY) {
         Rectangle rectPlayer = new Rectangle(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
         rectPlayer.setX(player.getPosX());
-        rectPlayer.setY(player.getPosY());              
+        rectPlayer.setY(player.getPosY());
         Rectangle rectPerson = new Rectangle(Constants.NPC_WIDTH, Constants.NPC_HEIGHT);
         rectPerson.setX(newX);
         rectPerson.setY(newY);
@@ -431,26 +442,24 @@ public class Gui {
             rectPerson.setX(nextX);
             rectPerson.setY(nextY);
             if (item.getBoundsInParent().intersects(rectPerson.getBoundsInParent())) {
-                
+
                 // npc item pickup/collision
                 object = this.itemsObjList.get(i);
                 if (!object.isPickable()) {
                     person.setDirection(Direction.getOpposite(person.getDirection()));
                     return true;
-                }
-                else if (!person.isCarrying() && object.isPickable()) {
-                    if (room.getInventory().exchangeItem(object, person.getInventory(),
-                            "npcPickup", nextX, nextY)) {  
-                                removeObj(object, item); // remove drawn but picked up item from GUI
-                                return true;       
+                } else if (!person.isCarrying() && object.isPickable()) {
+                    if (room.getInventory().exchangeItem(object, person.getInventory(), "npcPickup", nextX, nextY)) {
+                        removeObj(object, item); // remove drawn but picked up item from GUI
+                        return true;
                     }
-                }                  
-            } 
+                }
+            }
             i++;
         }
         return false;
     }
-    
+
     public Object[] getHitItem(int nextX, int nextY, int hitboxX, int hitboxY) {
         Object[] returnObj = new Object[2];
         int i = 0;
@@ -463,7 +472,7 @@ public class Gui {
             if (item.getBoundsInParent().intersects(rectPerson.getBoundsInParent())) {
                 returnObj[0] = itemsObjList.get(i);
                 returnObj[1] = item;
-            } 
+            }
             i++;
         }
         return returnObj;
@@ -474,13 +483,11 @@ public class Gui {
             ImageView itemImg = null;
             if (g.getType() == "Key") {
                 itemImg = new ImageView(keyGroundImage);
-            }
-            else if (g.getType() == "Chest") {
+            } else if (g.getType() == "Chest") {
                 Container chest = (Container) g;
                 if (chest.isOpen()) {
                     itemImg = new ImageView(chestOpenImage);
-                }
-                else {
+                } else {
                     itemImg = new ImageView(chestImage);
                 }
             }
@@ -489,14 +496,14 @@ public class Gui {
             this.itemsList.add(itemImg);
             this.itemsObjList.add(g);
             this.root.getChildren().add(itemImg);
-        }         
+        }
     }
 
     public void removeObj(GameObject object, Node item) {
         this.itemsList.remove(item);
         this.itemsObjList.remove(object);
-    //    System.out.println("removing object " + object.toString() + " item " + item);
-        this.root.getChildren().remove(item);        
+        // System.out.println("removing object " + object.toString() + " item " + item);
+        this.root.getChildren().remove(item);
     }
 
     // hero movement based on https://gist.github.com/jewelsea/8321740
@@ -505,11 +512,20 @@ public class Gui {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
-                    case W:     goNorth = true; break;
-                    case S:     goSouth = true; break;
-                    case A:     goWest  = true; break;
-                    case D:     goEast  = true; break;
-                    default: break;
+                    case W:
+                        goNorth = true;
+                        break;
+                    case S:
+                        goSouth = true;
+                        break;
+                    case A:
+                        goWest = true;
+                        break;
+                    case D:
+                        goEast = true;
+                        break;
+                    default:
+                        break;
                 }
             }
         });
@@ -518,11 +534,20 @@ public class Gui {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
-                    case W:     goNorth = false; break;
-                    case S:     goSouth = false; break;
-                    case A:     goWest  = false; break;
-                    case D:     goEast  = false; break;
-                    default: break;
+                    case W:
+                        goNorth = false;
+                        break;
+                    case S:
+                        goSouth = false;
+                        break;
+                    case A:
+                        goWest = false;
+                        break;
+                    case D:
+                        goEast = false;
+                        break;
+                    default:
+                        break;
                 }
             }
         });
@@ -532,11 +557,15 @@ public class Gui {
             public void handle(long now) {
                 int dx = 0, dy = 0;
 
-                if (goNorth) dy -= 3;
-                if (goSouth) dy += 3;
-                if (goEast)  dx += 3;
-                if (goWest)  dx -= 3;
- 
+                if (goNorth)
+                    dy -= 3;
+                if (goSouth)
+                    dy += 3;
+                if (goEast)
+                    dx += 3;
+                if (goWest)
+                    dx -= 3;
+
                 moveHeroBy(dx, dy);
             }
         };
@@ -544,9 +573,10 @@ public class Gui {
     }
 
     private void moveHeroBy(int dx, int dy) {
-        if (dx == 0 && dy == 0) return;
+        if (dx == 0 && dy == 0)
+            return;
 
-        final double cx = this.hero.getBoundsInParent().getWidth()  / 2;
+        final double cx = this.hero.getBoundsInParent().getWidth() / 2;
         final double cy = this.hero.getBoundsInParent().getHeight() / 2;
 
         double x = cx + this.hero.getLayoutX() + dx;
@@ -557,7 +587,7 @@ public class Gui {
     }
 
     private void moveHeroTo(double x, double y) {
-        final double cx = hero.getBoundsInParent().getWidth()  / 2;
+        final double cx = hero.getBoundsInParent().getWidth() / 2;
         final double cy = hero.getBoundsInParent().getHeight() / 2;
 
         int newX = (int) (x - cx);
@@ -567,7 +597,7 @@ public class Gui {
         Node hitNode = (Node) hitItem[1];
         player.setCurRoom();
         player.setSelectedPlayerObject(null);
-        
+
         if (!wallCollision(newX, newY, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT) && hitObject == null) {
             player.setPosX(newX);
             player.setPosY(newY);
@@ -581,16 +611,13 @@ public class Gui {
             changeHeroImg++;
             if (changeHeroImg == 4) {
                 this.hero.setImage(heroImage2);
-            }
-            else if (changeHeroImg == 8) {
+            } else if (changeHeroImg == 8) {
                 this.hero.setImage(heroImage3);
-            }
-            else if (changeHeroImg == 12) {
+            } else if (changeHeroImg == 12) {
                 changeHeroImg = 0;
                 this.hero.setImage(heroImage1);
             }
-        }
-        else if (hitObject != null) {
+        } else if (hitObject != null) {
             handleHitObject(hitObject, hitNode, newX, newY);
         }
     }
@@ -601,26 +628,27 @@ public class Gui {
 
         if (hitObject.isPickable()) {
             Room room = roomGroup.get(player.getCurRoom() - 1);
-            if (room.getInventory().exchangeItem(hitObject, player.getInventory(), "playerPickup", newX, newY)) {   
-                removeObj(hitObject, hitNode);  
-                hideInventory(true);      
+            if (room.getInventory().exchangeItem(hitObject, player.getInventory(), "playerPickup", newX, newY)) {
+                removeObj(hitObject, hitNode);
+                hideInventory(true);
                 setUpInventory(player.getInventory(), player);
+                soundPlayer("/pickup.wav");
             }
-        }
-        else if (hitObject.getType() == "Chest") {
+        } else if (hitObject.getType() == "Chest") {
             chest = (Container) hitObject;
             if (!chest.isOpen()) {
                 update.setPaused(true);
-                tryUnlockChest(chest, hitObject, hitNode);    
+                tryUnlockChest(chest, hitObject, hitNode);
             }
-        }
-        else if (hitNode.getUserData() != null && hitNode.getUserData() == "door") {
+        } else if (hitNode.getUserData() != null && hitNode.getUserData() == "door") {
             for (GameObject playerObject : player.getInventory().getInventory()) {
                 if (playerObject instanceof Key) {
                     Key key = (Key) playerObject;
                     if (key.isMaster()) {
-                        this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
-                        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
+                        this.messageLabel.setBackground(new Background(
+                                new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
+                        this.messageLabel
+                                .setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
                         this.messageLabel.setText("CONGRATULATIONS, YOU ESCAPED THE BASEMENT!");
                         this.update.musicPlayer("stop", "/loop.wav", true);
                         this.update.musicPlayer("start", "/win.wav", false);
@@ -630,7 +658,19 @@ public class Gui {
                 }
             }
         }
-        
+
+    }
+
+    private void soundPlayer(String string) {
+        AudioInputStream audioInputStream;
+        try {
+            audioInputStream = AudioSystem.getAudioInputStream(Update.class.getResource(string));
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        } 
     }
 
     private void tryUnlockChest(Container chest, GameObject hitObject, Node hitNode) {
@@ -660,10 +700,12 @@ public class Gui {
                 player.getInventory().addToInventory(player.getInventory(), keyToTake); // add master key to player inv
                 chest.getInventory().remove(keyToTake); // remove from chest inv
                 showMessage("Door key found, head to the exit!");
+                soundPlayer("/doorKeyPickup.wav");
                 this.doorKeyFound = true;
             }
             else {
                 showMessage("Opened the chest but nothing was found inside, the key " + key.getId() + " vanished");
+                soundPlayer("/empty.wav");
             }
             // refresh inventories
             hideInventory(true);
@@ -688,5 +730,9 @@ public class Gui {
 
 	public void setUpdateRef(Update update) {
         this.update = update;
+	}
+
+	public void setNpcHit(Npc person) {
+        this.hitPerson = person;
 	}
 }

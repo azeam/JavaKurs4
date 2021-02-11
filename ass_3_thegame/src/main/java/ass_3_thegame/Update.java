@@ -40,6 +40,8 @@ public class Update implements Runnable {
         try {
             if (action.equals("stop")) {
                 clip.stop();
+                clip.close();
+                clip = null;
                 return;
             }
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Update.class.getResource(file));
@@ -111,7 +113,7 @@ public class Update implements Runnable {
                     Direction curDir;
                     int newX, newY;
                     Room room;
-                    Constants.GL_NPC_HIT = null;
+                    gui.setNpcHit(null);
                     for (Npc person : personGroup) {
                         
                         room = roomGroup.get(person.getCurRoom() - 1);
@@ -131,7 +133,7 @@ public class Update implements Runnable {
                                 else {
                                     gui.showMessage("Find another key to trade with " + person.getName());
                                 }
-                                Constants.GL_NPC_HIT = person;
+                                gui.setNpcHit(person);
                             }
                             paused = true;
                         }

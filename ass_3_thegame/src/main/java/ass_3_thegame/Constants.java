@@ -1,9 +1,6 @@
 package ass_3_thegame;
 
-public class Constants {
-    protected boolean GL_PAUSED = false; // global paused flag
-	protected static Npc GL_NPC_HIT; // global npc hit flag, TODO: could be made in a better way
-    
+public class Constants {    
     // values that could be placed in a settings menu (most of them)
     public final static int 
                             WINDOW_HEIGHT = 800,
