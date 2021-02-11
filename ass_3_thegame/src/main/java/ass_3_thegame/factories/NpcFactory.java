@@ -9,20 +9,15 @@ import ass_3_thegame.Person;
 
 public class NpcFactory {
 
-    public Npc createNpc(String type, String name, Gui gui) {
-        if (type.equals("Person")) {
-            return new Person(name, gui);
-        }
-        else {
-            return null;
-        }
+    public Npc createNpc(String name, Gui gui) {
+        return new Person(name, gui);
     }
 
-	public ArrayList<Npc> createGroup(String type, int number, List<String> names, Gui gui) {
+	public ArrayList<Npc> createGroup(int number, List<String> names, Gui gui) {
         ArrayList<Npc> group = new ArrayList<Npc>();
         for (int i=0; i<number; i++) {
             String name = names.get(i);
-            group.add(createNpc(type, name, gui));
+            group.add(createNpc(name, gui));
         }
         return group;
 	}

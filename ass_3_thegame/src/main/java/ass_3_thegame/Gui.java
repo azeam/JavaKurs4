@@ -35,6 +35,7 @@ public class Gui {
     private Group walls = new Group();
     private boolean gameBeat = false;
     private boolean doorKeyFound = false;
+    private Update update;
 
     private Label playerLabel, otherInvLabel, messageLabel;
     private List<Integer> monsterImageUpdates = new ArrayList<Integer>();
@@ -594,6 +595,8 @@ public class Gui {
                         this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
                         this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
                         this.messageLabel.setText("CONGRATULATIONS, YOU ESCAPED THE BASEMENT!");
+                        this.update.musicPlayer("stop", "/loop.wav", true);
+                        this.update.musicPlayer("start", "/win.wav", false);
                         this.timer.stop();
                         this.gameBeat = true;
                     }
@@ -655,4 +658,8 @@ public class Gui {
         this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default font seems to be about 4 px wide/char
 	    }
     }
+
+	public void setUpdateRef(Update update) {
+        this.update = update;
+	}
 }

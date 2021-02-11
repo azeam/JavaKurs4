@@ -1,14 +1,24 @@
 package ass_3_thegame;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import ass_3_thegame.factories.GameObjectFactory;
 import ass_3_thegame.factories.NpcFactory;
 import ass_3_thegame.factories.RoomFactory;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 
 public class Update implements Runnable {
 
@@ -20,10 +30,30 @@ public class Update implements Runnable {
     private List<String> namesList;
     private ArrayList<Npc> personGroup;
     private Player player;
+    private Clip clip;
 
     public Update(Gui gui, Player player) {
         this.gui = gui;
         this.player = player;
+        gui.setUpdateRef(this);
+    }
+
+    public void musicPlayer(String action, String file, boolean loop) {
+        try {
+            if (action.equals("stop")) {
+                clip.stop();
+                return;
+            }
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Update.class.getResource(file));
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            if (loop) {
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
     }
 
     private void placeMasterKey(ArrayList<Room> roomGroup2) {
@@ -63,11 +93,12 @@ public class Update implements Runnable {
         });
         
         namesList = names.getRandomNames(Constants.NUM_NPCS);
-        personGroup = npcFactory.createGroup("Person", Constants.NUM_NPCS, namesList, gui);
+        personGroup = npcFactory.createGroup(Constants.NUM_NPCS, namesList, gui);
         
         Platform.runLater(() -> {
             gui.setUpPerson(personGroup);
         });
+        musicPlayer("start", "/loop.wav", true);
         updateGui(personGroup, roomGroup);
     }
 
