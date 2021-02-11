@@ -27,7 +27,7 @@ import javafx.stage.Stage;
 
 public class Gui {
     private GraphicsContext background;
-    private Node hero;
+    private ImageView hero;
     private boolean goNorth, goSouth, goEast, goWest;
     private Pane root = new Pane();
     private Player player;
@@ -37,28 +37,36 @@ public class Gui {
     private boolean doorKeyFound = false;
 
     private Label playerLabel, otherInvLabel, messageLabel;
-
+    private List<Integer> monsterImageUpdates = new ArrayList<Integer>();
     private List<ImageView> personsList = new ArrayList<ImageView>();
     private List<ImageView> itemsList = new ArrayList<ImageView>();
     private List<GameObject> itemsObjList = new ArrayList<GameObject>();
     private AnimationTimer timer;
 
-    private static final Image heroImage = new Image(Constants.HERO_IMAGE_LOC);
-    private static final Image monsterImage = new Image(Constants.MONSTER_IMG_LOC);
-    private static final Image monsterItemImage = new Image(Constants.MONSTER_IMG_ITEM_LOC);
-    private static final Image keyImage = new Image(Constants.KEY_IMAGE_LOC);
-    private static final Image keyMasterImage = new Image(Constants.KEY_MASTER_IMAGE_LOC);
-    private static final Image keyGroundImage = new Image(Constants.KEY_GROUND_IMAGE_LOC);
-    private static final Image chestImage = new Image(Constants.CHEST_IMAGE_LOC);
-    private static final Image chestOpenImage = new Image(Constants.CHEST_OPEN_IMAGE_LOC);
-    private static final Image doorImage = new Image(Constants.DOOR_IMAGE_LOC);
+    private final Image heroImage1 = new Image(getClass().getResource("/hero1.png").toExternalForm());
+    private final Image heroImage2 = new Image(getClass().getResource("/hero2.png").toExternalForm());
+    private final Image heroImage3 = new Image(getClass().getResource("/hero3.png").toExternalForm());
+    private final Image monsterImage1 = new Image(getClass().getResource("/monster1.png").toExternalForm());
+    private final Image monsterItemImage1 = new Image(getClass().getResource("/monster_item1.png").toExternalForm());
+    private final Image monsterImage2 = new Image(getClass().getResource("/monster2.png").toExternalForm());
+    private final Image monsterItemImage2 = new Image(getClass().getResource("/monster_item2.png").toExternalForm());
+    private final Image monsterImage3 = new Image(getClass().getResource("/monster3.png").toExternalForm());
+    private final Image monsterItemImage3 = new Image(getClass().getResource("/monster_item3.png").toExternalForm());
+    private final Image keyImage = new Image(getClass().getResource("/key.png").toExternalForm());
+    private final Image keyMasterImage = new Image(getClass().getResource("/key_master.png").toExternalForm());
+    private final Image keyGroundImage = new Image(getClass().getResource("/key_ground.png").toExternalForm());
+    private final Image chestImage = new Image(getClass().getResource("/chest.png").toExternalForm());
+    private final Image chestOpenImage = new Image(getClass().getResource("/chest_open.png").toExternalForm());
+    private final Image doorImage = new Image(getClass().getResource("/door.png").toExternalForm());
+
+    private int changeHeroImg = 0;
 
     // set up base GUI items
     public Gui(Stage stage, Player player) {
         this.player = player;
         Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
         this.background = canvasBG.getGraphicsContext2D();
-        this.hero = new ImageView(heroImage);
+        this.hero = new ImageView(heroImage1);
 
         Group basement = new Group(hero);
 
@@ -73,7 +81,7 @@ public class Gui {
         moveHeroTo(Constants.MARGIN + Constants.ROOM_WIDTH / 2, Constants.MARGIN + Constants.ROOM_HEIGHT / 2);
 
         stage.setResizable(false);
-        stage.setTitle("The Game");
+        stage.setTitle("The Basement");
         stage.setOnCloseRequest(e -> System.exit(0));
         stage.setScene(scene);
         stage.show();
@@ -136,11 +144,34 @@ public class Gui {
     public void paint(ArrayList<Npc> personGroup) {
         Npc person;
         for (int i = 0; i < personGroup.size(); i++) {
+            int monsterInt = monsterImageUpdates.get(i);
+            monsterInt = monsterInt + 1;
+            monsterImageUpdates.set(i, monsterInt);
             person = personGroup.get(i);
             if (person.isCarrying()) {
-                this.personsList.get(i).setImage(monsterItemImage);
+                if (monsterInt == 20) {
+                    this.personsList.get(i).setImage(monsterItemImage1);
+                }
+                else if (monsterInt == 40) {
+                    this.personsList.get(i).setImage(monsterItemImage2);
+                }
+                else if (monsterInt == 60) {
+                    monsterInt = 0;
+                    monsterImageUpdates.set(i, monsterInt);
+                    this.personsList.get(i).setImage(monsterItemImage3);
+                }
             } else {
-                this.personsList.get(i).setImage(monsterImage);
+                if (monsterInt == 20) {
+                    this.personsList.get(i).setImage(monsterImage1);
+                }
+                else if (monsterInt == 40) {
+                    this.personsList.get(i).setImage(monsterImage2);
+                }
+                else if (monsterInt == 60) {
+                    monsterInt = 0;
+                    monsterImageUpdates.set(i, monsterInt);
+                    this.personsList.get(i).setImage(monsterImage3);
+                }
             }
             this.personsList.get(i).setTranslateX(personGroup.get(i).getPosX());
             this.personsList.get(i).setTranslateY(personGroup.get(i).getPosY());
@@ -323,7 +354,8 @@ public class Gui {
 
     public void setUpPerson(ArrayList<Npc> personGroup) {
         for (int i = 0; i < personGroup.size(); i++) {
-            ImageView monster = new ImageView(monsterImage);
+            ImageView monster = new ImageView(monsterImage1);
+            monsterImageUpdates.add(0);
             this.personsList.add(monster);
             this.root.getChildren().add(monster);
         }
@@ -522,8 +554,17 @@ public class Gui {
             this.hero.relocate(newX, newY);
             this.hero.toFront(); // TODO: not working as intended
             Constants.GL_PAUSED = false;
-            if (this.messageLabel != null && !this.messageLabel.getText().contains("Door key found")) {
-                showMessage(""); // hide message
+            showMessage(""); // hide message
+            changeHeroImg++;
+            if (changeHeroImg == 4) {
+                this.hero.setImage(heroImage2);
+            }
+            else if (changeHeroImg == 8) {
+                this.hero.setImage(heroImage3);
+            }
+            else if (changeHeroImg == 12) {
+                changeHeroImg = 0;
+                this.hero.setImage(heroImage1);
             }
         }
         else if (hitObject != null) {
@@ -556,7 +597,7 @@ public class Gui {
                     Key key = (Key) playerObject;
                     if (key.isMaster()) {
                         this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
-                        showMessage("CONGRATULATIONS, YOU ESCAPED THE BASEMENT!");
+                        this.messageLabel.setText("CONGRATULATIONS, YOU ESCAPED THE BASEMENT!");
                         this.timer.stop();
                         this.gameBeat = true;
                     }
@@ -611,9 +652,11 @@ public class Gui {
 	}
 
 	public void showMessage(String string) {
-        this.messageLabel.setText(string);
+        if (this.messageLabel != null) {
+            if (!this.messageLabel.getText().contains("Door key found")) {
+                this.messageLabel.setText(string);
+            }
         this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default capital font seems to be about 5 px wide/char
-	}
-
-	
+	    }
+    }
 }

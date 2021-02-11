@@ -24,21 +24,27 @@ public class Constants {
                             NUM_ROOMS = 4, // 2 min
                             WINDOW_WIDTH = NUM_ROOMS * ROOM_WIDTH + 2 * MARGIN,
                             ALL_ROOMS_WIDTH = NUM_ROOMS * ROOM_WIDTH,
-	                        PLAYER_WIDTH = 30, // set to img values for hitbox
-                            PLAYER_HEIGHT = 30,  // set to img values for hitbox
+	                        PLAYER_WIDTH = 32, // set to img values for hitbox
+                            PLAYER_HEIGHT = 32,  // set to img values for hitbox
                             DOOR_HEIGHT = 50; // more looks better but placing objects needs to be fixed or there is higher chance of getting stuck in rooms
 
     public static final String  
                             PLAYER_NAME = "Azeam",
-                            HERO_IMAGE_LOC = "https://www.bufonaturvard.se/images/hero.png",
-                            MONSTER_IMG_LOC = "https://www.bufonaturvard.se/images/monster2.png",
-                            MONSTER_IMG_ITEM_LOC = "https://www.bufonaturvard.se/images/monster_item2.png",
-                            KEY_IMAGE_LOC = "https://www.bufonaturvard.se/images/key.png",
-                            KEY_GROUND_IMAGE_LOC = "https://www.bufonaturvard.se/images/key_ground.png",
-                            KEY_MASTER_IMAGE_LOC = "https://www.bufonaturvard.se/images/key_master.png",
-                            EXCHANGE_IMAGE_LOC = "https://www.bufonaturvard.se/images/exchange.png",
-                            CHEST_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest.png",
-                            CHEST_OPEN_IMAGE_LOC = "https://www.bufonaturvard.se/images/chest_open.png",
-                            DOOR_IMAGE_LOC = "https://www.bufonaturvard.se/images/door.png";
+                            HERO_IMAGE_LOC1 = "hero1.png",
+                            HERO_IMAGE_LOC2 = "hero2.png",
+                            HERO_IMAGE_LOC3 = "hero3.png",
+                            MONSTER_IMG_LOC1 = "monster1.png",
+                            MONSTER_IMG_LOC2 = "monster2.png",
+                            MONSTER_IMG_LOC3 = "monster3.png",
+                            MONSTER_IMG_ITEM_LOC1 = "monster_item1.png",
+                            MONSTER_IMG_ITEM_LOC2 = "monster_item2.png",
+                            MONSTER_IMG_ITEM_LOC3 = "monster_item3.png",
+                            KEY_IMAGE_LOC = "key.png",
+                            KEY_GROUND_IMAGE_LOC = "key_ground.png",
+                            KEY_MASTER_IMAGE_LOC = "key_master.png",
+                            EXCHANGE_IMAGE_LOC = "exchange.png",
+                            CHEST_IMAGE_LOC = "chest.png",
+                            CHEST_OPEN_IMAGE_LOC = "chest_open.png",
+                            DOOR_IMAGE_LOC = "door.png";
 
 }
