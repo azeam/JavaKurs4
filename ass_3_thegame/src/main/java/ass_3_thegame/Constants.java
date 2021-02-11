@@ -1,7 +1,7 @@
 package ass_3_thegame;
 
 public class Constants {
-    protected static boolean GL_PAUSED = false; // global paused flag
+    protected boolean GL_PAUSED = false; // global paused flag
 	protected static Npc GL_NPC_HIT; // global npc hit flag, TODO: could be made in a better way
     
     // values that could be placed in a settings menu (most of them)

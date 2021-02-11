@@ -1,8 +1,6 @@
 package ass_3_thegame;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,7 +16,6 @@ import ass_3_thegame.factories.NpcFactory;
 import ass_3_thegame.factories.RoomFactory;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 
 public class Update implements Runnable {
 
@@ -31,6 +28,7 @@ public class Update implements Runnable {
     private ArrayList<Npc> personGroup;
     private Player player;
     private Clip clip;
+    private boolean paused = false;
 
     public Update(Gui gui, Player player) {
         this.gui = gui;
@@ -108,7 +106,7 @@ public class Update implements Runnable {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!Constants.GL_PAUSED) {
+                if (!paused) {
                     gui.hideInventory(false); // hide inventory when not trading
                     Direction curDir;
                     int newX, newY;
@@ -135,7 +133,7 @@ public class Update implements Runnable {
                                 }
                                 Constants.GL_NPC_HIT = person;
                             }
-                            Constants.GL_PAUSED = true;
+                            paused = true;
                         }
                         else if (gui.wallCollision(newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
                             person.setDirection(Direction.getOpposite(person.getDirection()));
@@ -168,5 +166,9 @@ public class Update implements Runnable {
         person.setPosY(newY);   
         person.setCurRoom();
     }
+
+	public void setPaused(boolean paused) {
+        this.paused = paused;
+	}
     
 }

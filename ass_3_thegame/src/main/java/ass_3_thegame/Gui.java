@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.AnimationTimer;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -11,7 +12,9 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -61,10 +64,12 @@ public class Gui {
     private final Image doorImage = new Image(getClass().getResource("/door.png").toExternalForm());
 
     private int changeHeroImg = 0;
+    private Stage stage;
 
     // set up base GUI items
     public Gui(Stage stage, Player player) {
         this.player = player;
+        this.stage = stage;
         Canvas canvasBG = new Canvas(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
         this.background = canvasBG.getGraphicsContext2D();
         this.hero = new ImageView(heroImage1);
@@ -345,7 +350,21 @@ public class Gui {
             this.background.setFill(Color.WHITE);
             this.background.fillRect(nodeWall.getX(), nodeWall.getY(), nodeWall.getWidth(), nodeWall.getHeight());
         }
-        this.root.getChildren().add(door);
+
+        Button newGameBtn = new Button("New game");
+        newGameBtn.setLayoutX(Constants.MARGIN);
+        newGameBtn.setLayoutY(Constants.MARGIN - 43);
+        newGameBtn.setStyle("-fx-cursor: hand; -fx-background-color: #090a0c, linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%), linear-gradient(#20262b, #191d22), radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0)); -fx-background-radius: 5,4,3,5; -fx-background-insets: 0,1,2,0; -fx-text-fill: white; -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 ); -fx-text-fill: linear-gradient(white, #d0d0d0); -fx-padding: 10 20 10 20;");
+        newGameBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                update.musicPlayer("stop", "", false);
+                Player player = new Player();
+                Gui gui = new Gui(stage, player);
+                (new Thread(new Update(gui, player))).start();
+            }
+        });
+
+        this.root.getChildren().addAll(door, newGameBtn);
     }
 
     public void setUpPerson(ArrayList<Npc> personGroup) {
@@ -555,7 +574,9 @@ public class Gui {
 
             this.hero.relocate(newX, newY);
             this.hero.toFront(); // TODO: not working as intended
-            Constants.GL_PAUSED = false;
+            if (this.update != null) { // is null on init
+                this.update.setPaused(false);
+            }
             showMessage(""); // hide message
             changeHeroImg++;
             if (changeHeroImg == 4) {
@@ -589,7 +610,7 @@ public class Gui {
         else if (hitObject.getType() == "Chest") {
             chest = (Container) hitObject;
             if (!chest.isOpen()) {
-                Constants.GL_PAUSED = true;
+                update.setPaused(true);
                 tryUnlockChest(chest, hitObject, hitNode);    
             }
         }
