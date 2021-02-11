@@ -13,7 +13,7 @@ public class Container extends GameObject {
         this.open = false;
         this.inventory = new Inventory(1, 1, "container", "chest " + this.id + " in room " + (room.getRoomId() + 1), room);
     }
-    // En subklass till GameObject som har ett Inventory. Kan vara låst eller öppet.
+
     public Inventory getInventory() {
         return this.inventory;
     }

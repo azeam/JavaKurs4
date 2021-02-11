@@ -99,13 +99,11 @@ public class Gui {
         this.playerLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 + Constants.MARGIN);
         this.playerLabel.setLayoutY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
         this.playerLabel.setId("playerLabel");
-        this.playerLabel.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(5.0), new Insets(-5.0))));
         this.playerLabel.setTextFill(Color.WHITE);
         this.otherInvLabel = new Label();
         this.otherInvLabel.setLayoutX(Constants.MARGIN);
         this.otherInvLabel.setLayoutY(Constants.MARGIN * 2 + Constants.ROOM_HEIGHT);
         this.otherInvLabel.setId("otherInvLabel");
-        this.otherInvLabel.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(5.0), new Insets(-5.0))));
         this.otherInvLabel.setTextFill(Color.WHITE);
         this.messageLabel = new Label();
         this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default capital font seems to be about 5 px wide/char
@@ -268,9 +266,6 @@ public class Gui {
                     exImgView.getStyleClass().add("leftItem");
                     exImgView.setOnMouseClicked(exchangeItemHandler(itemImg));
                     root.getChildren().add(exImgView);
-                }
-                else {
-                    messageLabel.setText("DOOR KEY FOUND, HEAD TO THE EXIT!");
                 }
             }
 
@@ -474,7 +469,7 @@ public class Gui {
     public void removeObj(GameObject object, Node item) {
         this.itemsList.remove(item);
         this.itemsObjList.remove(object);
-        System.out.println("removing object " + object.toString() + " item " + item);
+    //    System.out.println("removing object " + object.toString() + " item " + item);
         this.root.getChildren().remove(item);        
     }
 
@@ -597,6 +592,7 @@ public class Gui {
                     Key key = (Key) playerObject;
                     if (key.isMaster()) {
                         this.messageLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, new CornerRadii(5.0), new Insets(-5.0))));
+                        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 5);
                         this.messageLabel.setText("CONGRATULATIONS, YOU ESCAPED THE BASEMENT!");
                         this.timer.stop();
                         this.gameBeat = true;
@@ -656,7 +652,7 @@ public class Gui {
             if (!this.messageLabel.getText().contains("Door key found")) {
                 this.messageLabel.setText(string);
             }
-        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default capital font seems to be about 5 px wide/char
+        this.messageLabel.setLayoutX(Constants.WINDOW_WIDTH / 2 - this.messageLabel.getText().length() * 4); // default font seems to be about 4 px wide/char
 	    }
     }
 }

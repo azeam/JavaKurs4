@@ -9,10 +9,10 @@ public class Constants {
                             WINDOW_HEIGHT = 800,
                             ROOM_WIDTH = 300,
                             ROOM_HEIGHT = 200,
-                            NPC_WIDTH = 24,  // set to img values for hitbox
-                            NPC_HEIGHT = 30, // set to img values for hitbox
+                            NPC_WIDTH = 32,  // set to img values for hitbox
+                            NPC_HEIGHT = 32, // set to img values for hitbox
                             OBJ_SIZE = 25,
-                            WALL_SIZE = 100,
+                            WALL_SIZE = 120,
                             WALL_WIDTH = 1,
                             INV_SIZE_NPC = 1, // should not be set higher, only set up for 1
                             INV_SIZE_NPC_MIN = 0,

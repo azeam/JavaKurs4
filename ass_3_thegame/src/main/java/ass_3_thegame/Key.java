@@ -9,7 +9,6 @@ public class Key extends GameObject {
         this.type = "Key";
         this.id = id;
         this.master = master;
-        System.out.println(master);
     }
 
     public boolean isMaster() {

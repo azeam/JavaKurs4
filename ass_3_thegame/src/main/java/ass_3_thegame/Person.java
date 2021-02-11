@@ -30,7 +30,7 @@ public class Person implements Npc {
     private void setStartPosition() {
         // don't place npc in wall or on item
         do {
-            System.out.println(this.npcName + " set position to " + this.posX + this.posY);
+        //    System.out.println(this.npcName + " set position to " + this.posX + this.posY);
             this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_WIDTH, Constants.ALL_ROOMS_WIDTH - Constants.NPC_WIDTH + Constants.MARGIN);
             this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.NPC_HEIGHT, Constants.ROOM_HEIGHT - Constants.NPC_HEIGHT + Constants.MARGIN);            
         } while (gui.wallCollision(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT) || gui.getHitItem(this.posX, this.posY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)[0] != null);

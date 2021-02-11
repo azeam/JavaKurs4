@@ -59,24 +59,24 @@ public class Inventory {
         GameObject[] objArray = inv.getInventory();
         GameObject[] newObjArray = new GameObject[inv.getMaxItems()];
         List<GameObject> arrAsList = Arrays.asList(objArray);
+        // sort list with nulls last
         newObjArray = arrAsList
             .stream()
             .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
             .toArray(GameObject[]::new);
 
+        // make list without nulls
         List<GameObject> arrAsListCopy = arrAsList
             .stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-            System.out.println("arraslistcopy size: " + arrAsListCopy.size() + " objArray.length: " + objArray.length);
+        // check if there's room in inventory (non null list < sorted list), add object to first free space
         if (arrAsListCopy.size() < objArray.length) {
             newObjArray[arrAsListCopy.size()] = gameObject;
             inv.setInventory(newObjArray);
-            System.out.println("Added item to inventory, new " + inv.getOwnerName() + " inventory: " + Arrays.toString(inv.getInventory()));
             return true;
         }
         else {
-            System.out.println("Unable to add to inventory, inv: " + Arrays.toString(newObjArray));
             return false;
         }
     }
@@ -111,13 +111,11 @@ public class Inventory {
             })
             .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
             .toArray(GameObject[]::new);
-            System.out.println("Exchanged item, new " + this.getOwnerName() + " inventory: " + Arrays.toString(this.getInventory()));
-
     }
 
+    // remove from inventory
 	public void remove(GameObject selected) {
         List<GameObject> arrAsList = Arrays.asList(this.inventory);
-
         this.inventory = arrAsList
             .stream()
             .map(x -> {
@@ -128,8 +126,6 @@ public class Inventory {
             })
             .sorted(Comparator.nullsLast(Comparator.comparing(GameObject::getType, Comparator.nullsLast(Comparator.reverseOrder()))))
             .toArray(GameObject[]::new);
-            System.out.println("Removed item, new " + this.getOwnerName() + " inventory: " + Arrays.toString(this.getInventory()));
-
 	}
 
 }

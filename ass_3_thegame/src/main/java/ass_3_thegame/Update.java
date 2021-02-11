@@ -90,7 +90,9 @@ public class Update implements Runnable {
                         newX = person.getPosX() + curDir.getX();
                         newY = person.getPosY() + curDir.getY();
                             
-                        if (gui.npcItemCollision(person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {}
+                        if (gui.npcItemCollision(person, room, newX, newY, Constants.NPC_WIDTH, Constants.NPC_HEIGHT)) {
+                            // handled in gui, but needs to be in this ugly if clause
+                        }
                         else if (gui.playerNpcCollision(person, newX, newY)) {
                             gui.setUpInventory(person.getInventory(), person);
                             if (person.isCarrying()) {
@@ -134,9 +136,6 @@ public class Update implements Runnable {
         person.setPosX(newX);
         person.setPosY(newY);   
         person.setCurRoom();
-        
-        int room = person.getCurRoom();
-     //   System.out.println(person.getName() + " is in room: " + room); 
     }
     
 }
