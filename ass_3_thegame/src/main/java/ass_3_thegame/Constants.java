@@ -14,7 +14,7 @@ public class Constants {
                             INV_SIZE_PLAYER = 5;
     public static String  
                             PLAYER_NAME = "Azeam",
-                            DIFFICULTY = "Normal"; // only East and Normal implemented
+                            DIFFICULTY = "Normal"; // only "Easy" and "Normal" implemented
     
     // final values that should probably not be changed
     public final static int 
