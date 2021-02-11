@@ -127,7 +127,10 @@ public class Update implements Runnable {
                             }
 
                             GameObject item = person.getInventory().getInventory()[0];
-                            if (!gui.wallCollision(behindX, behindY, Constants.OBJ_SIZE, Constants.OBJ_SIZE) && person.getInventory().exchangeItem(item, room.getInventory(), "npcDropoff", behindX, behindY)) {
+                            if (!gui.wallCollision(behindX, behindY, Constants.OBJ_SIZE, Constants.OBJ_SIZE) && 
+                                behindX < Constants.WINDOW_WIDTH - Constants.MARGIN && behindX > Constants.MARGIN &&
+                                behindY > Constants.MARGIN && behindY < Constants.MARGIN + Constants.ROOM_HEIGHT && 
+                                person.getInventory().exchangeItem(item, room.getInventory(), "npcDropoff", behindX, behindY)) {
                                 gui.addItem(item);
                             }
                         }
