@@ -6,11 +6,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class Names {
     // get random name from online API
@@ -30,11 +30,11 @@ public class Names {
                 String name = (String) jsonArray.get(i);
                 names.add(name);
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (InterruptedException | IOException e) {
+            // enable offline play/backup if API goes down
+            names = Arrays.asList("Ola", "Dennis", "Malek", "Anton", "Alexander", "Andreas", "Christer", "Rosita", "Mohammed", "Yousef");
+            return names;
+        } catch (org.json.simple.parser.ParseException e) {
             e.printStackTrace();
         }
         return names;
