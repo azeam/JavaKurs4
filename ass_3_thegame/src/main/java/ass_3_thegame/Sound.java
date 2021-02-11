@@ -20,7 +20,7 @@ public class Sound {
                 musicClip = null;
                 return;
             }
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Update.class.getResource(file));
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Sound.class.getResource(file));
             musicClip = AudioSystem.getClip();
             musicClip.open(audioInputStream);
             if (loop) {
@@ -35,7 +35,7 @@ public class Sound {
     public void soundPlayer(String string) {
         AudioInputStream audioInputStream;
         try {
-            audioInputStream = AudioSystem.getAudioInputStream(Update.class.getResource(string));
+            audioInputStream = AudioSystem.getAudioInputStream(Sound.class.getResource(string));
             Clip clip = AudioSystem.getClip();
             clip.open(audioInputStream);
             clip.start();
