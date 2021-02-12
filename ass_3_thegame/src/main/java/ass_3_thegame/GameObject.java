@@ -17,12 +17,12 @@ public abstract class GameObject {
                     // set some margins near room openings to prevent getting stuck in room
                     this.posX = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.ROOM_WIDTH * roomNumber + Constants.OBJ_SIZE * 2, 
                                                                     Constants.ROOM_WIDTH * (roomNumber + 1) - Constants.OBJ_SIZE * 2 + Constants.MARGIN);
-                    this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE, 
-                                                                    Constants.ROOM_HEIGHT - Constants.OBJ_SIZE + Constants.MARGIN); 
-                } while ((this.posX + Constants.OBJ_SIZE > Constants.MARGIN + Constants.ROOM_WIDTH / 2 - Constants.PLAYER_WIDTH &&
-                        this.posX + Constants.OBJ_SIZE < Constants.MARGIN + Constants.ROOM_WIDTH / 2 + Constants.PLAYER_WIDTH) && 
-                        (this.posY + Constants.OBJ_SIZE > Constants.MARGIN + Constants.ROOM_HEIGHT / 2 - Constants.PLAYER_HEIGHT &&
-                        this.posY + Constants.OBJ_SIZE < Constants.MARGIN + Constants.ROOM_HEIGHT / 2 + Constants.PLAYER_HEIGHT));
+                    this.posY = ThreadLocalRandom.current().nextInt(Constants.MARGIN + Constants.OBJ_SIZE * 2, 
+                                                                    Constants.ROOM_HEIGHT - Constants.OBJ_SIZE * 2 + Constants.MARGIN); 
+                } while ((this.posX + Constants.OBJ_SIZE > Constants.MARGIN + Constants.ROOM_WIDTH / 2 - Constants.PLAYER_WIDTH * 2 &&
+                        this.posX + Constants.OBJ_SIZE < Constants.MARGIN + Constants.ROOM_WIDTH / 2 + Constants.PLAYER_WIDTH * 2) && 
+                        (this.posY + Constants.OBJ_SIZE > Constants.MARGIN + Constants.ROOM_HEIGHT / 2 - Constants.PLAYER_HEIGHT * 2 &&
+                        this.posY + Constants.OBJ_SIZE < Constants.MARGIN + Constants.ROOM_HEIGHT / 2 + Constants.PLAYER_HEIGHT * 2));
         } 
     }
 

@@ -24,7 +24,6 @@ public class Person implements Npc {
         this.gui = gui;
         this.inventory = new Inventory(Constants.INV_SIZE_NPC_MIN, Constants.INV_SIZE_NPC, "npc", name, null);
         setStartPosition();
-        setCurRoom();
     }
 
     private void setStartPosition() {
@@ -40,6 +39,7 @@ public class Person implements Npc {
         this.posY + Constants.OBJ_SIZE < Constants.MARGIN + Constants.ROOM_HEIGHT / 2 + Constants.PLAYER_HEIGHT));
 
         direction = Direction.getRandom();
+        setCurRoom();
     }
 
     @Override

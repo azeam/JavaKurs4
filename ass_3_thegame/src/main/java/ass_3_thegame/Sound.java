@@ -10,7 +10,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Sound {
     private Clip musicClip;
-
+    private Clip clip;
     // in theory it should not be necessary to use two near identical methods for this, in practice it makes everything a lot easier...
     public void musicPlayer(String action, String file, boolean loop) {
         try {
@@ -36,7 +36,8 @@ public class Sound {
         AudioInputStream audioInputStream;
         try {
             audioInputStream = AudioSystem.getAudioInputStream(Sound.class.getResource(string));
-            Clip clip = AudioSystem.getClip();
+            clip = null; // attempt at fixing LUE in certain occassions
+            clip = AudioSystem.getClip();
             clip.open(audioInputStream);
             clip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {

@@ -120,6 +120,9 @@ public class Gui {
     public void paint(ArrayList<Npc> personGroup) {
         Npc person;
         for (int i = 0; i < personGroup.size(); i++) {
+            if (monsterImageUpdates.size() == 0) {
+                return;
+            }
             int monsterInt = monsterImageUpdates.get(i);
             monsterInt = monsterInt + 1;
             monsterImageUpdates.set(i, monsterInt);
@@ -389,7 +392,7 @@ public class Gui {
         this.root.getChildren().remove(item);
     }
 
-    void moveHeroBy(int dx, int dy) {
+    protected void moveHeroBy(int dx, int dy) {
         if (dx == 0 && dy == 0)
             return;
 

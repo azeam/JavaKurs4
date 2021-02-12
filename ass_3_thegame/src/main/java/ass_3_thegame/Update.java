@@ -87,7 +87,9 @@ public class Update implements Runnable {
                     Room room;
                     gui.setNpcHit(null);
                     for (Npc person : personGroup) {
-                        
+                        if (person.getCurRoom() == 0) {
+                            return;
+                        }
                         room = roomGroup.get(person.getCurRoom() - 1);
                         curDir = person.getDirection();
                         newX = person.getPosX() + curDir.getX();

@@ -64,8 +64,8 @@ public class TradeClickHandler {
                             gui.setUpInventory(person.getInventory(), person);
                             person.setDirection(Direction.getOpposite(person.getDirection()));
                             gui.player.setSelectedPlayerObject(null); // reset selection after trading
-                            Sound sound = new Sound();
-                            sound.soundPlayer(Constants.SOUND_PICKUP);
+                            //Sound sound = new Sound();
+                            gui.sounds.soundPlayer(Constants.SOUND_PICKUP);
                         }
                     }
                 };
