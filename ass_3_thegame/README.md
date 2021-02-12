@@ -6,6 +6,3 @@ Use W, A, S, D to move the main character. In one of the chests the door key - u
 
 ## Note  
 Not all games are possible to complete and you might be stuck in the basement for all eternity, you have been warned! (Or you can just click "New game").
-
-## Credits  
-Original score (main music) by Alexander Granlund
